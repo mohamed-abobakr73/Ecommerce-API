@@ -23,53 +23,16 @@ const findUser = asyncWrapper(async (req, res, next) => {
 });
 
 const createUser = asyncWrapper(async (req, res, next) => {
-  const { firstName, lastName, email, password, confirmPassword, phone, role } =
-    req.body;
+  const validatedData = req.body;
 
-  // Checking if the the password and confirm password is matched.
-  if (!(password === confirmPassword)) {
-    const error = new AppError(
-      "Password and confirm password do not match.",
-      400,
-      httpStatusText.FAIL
-    );
-    return next(error);
-  }
-
-  // Hashing the password.
-  const hashedPassword = await bcrypt.hashSync(password, 10);
-
-  // Creating the new user and saving it to the database.
-  const newUser = {
-    firstName,
-    lastName,
-    email,
-    password: hashedPassword,
-    phone,
-    role: role ? role : "user",
-  };
-
-  const newUserId = await usersService.addNewUser(newUser);
-
-  // Generating JWT token.
-  const tokenPayload = {
-    userName: `${newUser.firstName} ${newUser.lastName}`,
-    email: newUser.email,
-    id: newUserId,
-    role: newUser.role,
-  };
-
-  const token = await generateJwt(tokenPayload);
-
-  const { password: excludedPassword, ...newUserData } = newUser;
+  const { user, token } = await usersService.addNewUser(validatedData);
 
   // Create user cart.
-  const userCart = await cartService.createUserCart(newUserId);
+  const userCart = await cartService.createUserCart(user.id);
 
-  // Returning the user data.
   return res.status(201).json({
     status: httpStatusText.SUCCESS,
-    data: { user: newUserData, token: token },
+    data: { user, token: token },
   });
 });
 

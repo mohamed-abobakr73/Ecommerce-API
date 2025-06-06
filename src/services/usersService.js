@@ -1,6 +1,22 @@
 import db from "../configs/connectToDb.js";
 import AppError from "../utils/AppError.js";
+import hashValue from "../utils/hashingUtils/hashValue.js";
 import { usersServiceQueries } from "../utils/sqlQueries/index.js";
+
+const generateTokenWithUserData = async (user) => {
+  const { firstName, lastName, email, role } = user.values;
+  const userId = user.insertId;
+
+  const tokenPayload = {
+    userName: `${firstName} ${lastName}`,
+    email,
+    id: userId,
+    role,
+  };
+
+  const token = await generateJwt(tokenPayload);
+  return token;
+};
 
 const findAllUsers = async (filters = null) => {
   const [users] = await db.query(usersServiceQueries.findAllUsersQuery);
@@ -51,19 +67,28 @@ const findUserService = async (filters, includePassword = false) => {
 const addNewUser = async (userData) => {
   const query = usersServiceQueries.createUserQuery;
 
+  const { firstName, lastName, password, email, phone, role } = userData;
+
+  const hashedPassword = hashValue(password);
+
   const queryParams = [
-    userData.firstName,
-    userData.lastName,
-    userData.email,
-    userData.password,
-    userData.phone,
-    userData.role,
+    firstName,
+    lastName,
+    email,
+    hashedPassword,
+    phone,
+    role || "user",
   ];
 
   const [user] = await db.execute(query, queryParams);
 
-  const userId = user.insertId;
-  return userId;
+  const token = await generateTokenWithUserData(user);
+
+  user.values.id = user.insertId;
+
+  delete user.values.password;
+
+  return { token, user: user.values };
 };
 
 export default { findAllUsers, findUserService, addNewUser };
