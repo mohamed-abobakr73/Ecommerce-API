@@ -3,10 +3,12 @@ import productsServiceQueries from "./productsServiceQueries.js";
 import addressesServiceQueries from "./addressesServiceQueries.js";
 import brandsServiceQueries from "./brandsServiceQueries.js";
 import cartServiceQueries from "./cartServiceQueries.js";
+import categoriesServiceQueries from "./categoriesServiceQueries.js";
 export {
   usersServiceQueries,
   productsServiceQueries,
   addressesServiceQueries,
   brandsServiceQueries,
   cartServiceQueries,
+  categoriesServiceQueries,
 };

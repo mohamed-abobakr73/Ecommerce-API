@@ -1,21 +1,28 @@
 import db from "../configs/connectToDb.js";
+import { categoriesServiceQueries } from "../utils/sqlQueries/index.js";
 
 const findAllCategories = async () => {
-  const [categories] = await db.query(`SELECT * FROM categories`);
+  const query = categoriesServiceQueries.findAllCategoriesQuery;
+
+  const [categories] = await db.query(query);
+
   return categories;
 };
 
 const findCategory = async (id) => {
-  const query = `SELECT category_id as categoryId, category_name as categoryName FROM categories WHERE category_id = ?`;
+  const query = categoriesServiceQueries.findCategoryQuery;
 
   const category = await db.execute(query, [id]);
+
   return category[0][0];
 };
 
 const addNewCategory = async (categoryName) => {
-  const query = `INSERT INTO categories (category_name) VALUES (?)`;
+  const query = categoriesServiceQueries.createCategoryQuery;
 
-  const [result] = await db.execute(query, [categoryName]);
+  const queryParams = [categoryName];
+
+  const [result] = await db.execute(query, queryParams);
 
   const categoryId = result.insertId;
 
@@ -23,15 +30,22 @@ const addNewCategory = async (categoryName) => {
 };
 
 const updateCategory = async (id, updatedCategory) => {
-  const query = `UPDATE categories SET category_name = ? WHERE category_id = ?`;
-  const [result] = await db.execute(query, [updatedCategory, id]);
+  const query = categoriesServiceQueries.updateCategoryQuery;
+
+  const queryParams = [updatedCategory, id];
+
+  const [result] = await db.execute(query, queryParams);
+
   return result.affectedRows;
 };
 
 const deleteCategory = async (id) => {
-  const query = `DELETE FROM categories WHERE category_id = ?`;
+  const query = categoriesServiceQueries.deleteCategoryQuery;
 
-  const [result] = await db.execute(query, [id]);
+  const queryParams = [id];
+
+  const [result] = await db.execute(query, queryParams);
+
   return result.affectedRows;
 };
 

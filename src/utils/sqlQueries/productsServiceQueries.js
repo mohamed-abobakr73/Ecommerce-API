@@ -24,7 +24,8 @@ FROM
 const createProductQuery = `
   INSERT INTO products
     (product_name, product_description, price, stock_quantity, seller_id, category_id, brand_id, product_image)
-    values (?, ?, ?, ?, ?, ?, ?, ?)
+  VALUES 
+      (?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
 const deleteProductQuery = `
