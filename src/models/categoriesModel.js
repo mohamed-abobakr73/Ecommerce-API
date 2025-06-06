@@ -1,4 +1,4 @@
-const createCategoriesModel = async () => {
+const createCategoriesTable = async () => {
   try {
     await db.query(`
       CREATE TABLE IF NOT EXISTS categories (
@@ -12,4 +12,4 @@ const createCategoriesModel = async () => {
   }
 };
 
-export default createCategoriesModel;
+export default createCategoriesTable;
