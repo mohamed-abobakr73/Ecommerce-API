@@ -28,7 +28,7 @@ const findUserQuery = (selectedFields) => {
   roles ON users.role_id = roles.role_id`;
 };
 
-const createUserQuery = ` 
+const createUserQuery = `
   INSERT INTO users
     (first_name, last_name, email, password, phone, role_id)
     values (?, ?, ?, ?, ?, ?)

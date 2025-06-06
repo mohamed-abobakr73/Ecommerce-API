@@ -1,32 +1,14 @@
 import db from "../configs/connectToDb.js";
+import { productsServiceQueries } from "../utils/sqlQueries/index.js";
 import camelToSnake from "../utils/camelToSnake.js";
-import snakeToCamel from "../utils/snakeToCamel.js";
 
-const getProductsQuery = `
-SELECT 
-  product_id as ${snakeToCamel("product_id")},
-  product_name as ${snakeToCamel("product_name")},
-  product_description as ${snakeToCamel("product_description")},
-  price,
-  stock_quantity as ${snakeToCamel("stock_quantity")},
-  category_name as ${snakeToCamel("category_name")},
-  brand_name as ${snakeToCamel("brand_name")},
-  image_path as ${snakeToCamel("image_path")},
-  products.created_at as ${snakeToCamel("created_at")},
-  seller_id as ${snakeToCamel("seller_id")}
-FROM
-  products
-      JOIN
-  categories ON products.category_id = categories.category_id
-      JOIN
-  brands ON products.brand_id = brands.brand_id
-      JOIN
-  images ON products.product_image = images.image_id`;
+// TODO ADD the update product, the find products by ids, and the decrement products quantity
 
 const findAllProducts = async () => {
-  const [products] = await db.query(
-    getProductsQuery + " ORDER BY product_id ASC;"
-  );
+  const query =
+    productsServiceQueries.findProductsQuery + " ORDER BY product_id ASC;";
+
+  const [products] = await db.query(query);
   return products;
 };
 
@@ -42,40 +24,31 @@ const findProductsByIds = async (ids) => {
 };
 
 const findProduct = async (id) => {
-  const query = getProductsQuery + " WHERE product_id = ?;";
+  const query =
+    productsServiceQueries.findProductsQuery + " WHERE product_id = ?;";
 
   const [[productData]] = await db.execute(query, [id]);
+
   return productData;
 };
 
 const addNewProduct = async (product) => {
   const { productData, productImage } = product;
-  const {
-    productName,
-    productDescription,
-    price,
-    stockQuantity,
-    sellerId,
-    category,
-    brand,
-  } = productData;
 
-  const query = `INSERT INTO
-  products
-    (product_name, product_description, price, stock_quantity, seller_id, category_id, brand_id, product_image)
-  values
-    (?, ?, ?, ?, ?, ?, ?, ?)`;
+  const query = productsServiceQueries.createProductQuery;
 
-  const [result] = await db.execute(query, [
-    productName,
-    productDescription,
-    price,
-    stockQuantity,
-    sellerId,
-    category,
-    brand,
+  const queryParams = [
+    productData.productName,
+    productData.productDescription,
+    productData.price,
+    productData.stockQuantity,
+    productData.sellerId,
+    productData.category,
+    productData.brand,
     productImage,
-  ]);
+  ];
+
+  const [result] = await db.execute(query, queryParams);
 
   return result.insertId;
 };
@@ -98,12 +71,14 @@ const updateProduct = async (id, data) => {
 };
 
 const deleteProduct = async (id) => {
-  const query = `DELETE FROM products WHERE product_id = ?`;
+  const query = productsServiceQueries.deleteProductQuery;
+
   const [result] = await db.execute(query, [id]);
+
   return result.affectedRows;
 };
 
-const decrementProductStockQunatity = async (products) => {
+const decrementProductStockQuantity = async (products) => {
   const query = `
   UPDATE products
   SET stock_quantity = CASE
@@ -128,5 +103,5 @@ export default {
   addNewProduct,
   updateProduct,
   deleteProduct,
-  decrementProductStockQunatity,
+  decrementProductStockQuantity,
 };
