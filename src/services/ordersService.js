@@ -1,4 +1,4 @@
-import pool from "./connectToDb.js";
+import pool from "../configs/connectToDb.js";
 import snakeToCamel from "../utils/snakeToCamel.js";
 const findOrderId = async (userId) => {
   const [result] = await pool.query(

@@ -1,4 +1,4 @@
-import pool from "./connectToDb.js";
+import pool from "../configs/connectToDb.js";
 
 const findCartId = async (userId) => {
   const [[{ cart_id: cartId }]] = await pool.query(

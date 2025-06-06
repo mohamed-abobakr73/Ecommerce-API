@@ -1,4 +1,4 @@
-import pool from "./connectToDb.js";
+import pool from "../configs/connectToDb.js";
 import camelToSnake from "../utils/camelToSnake.js";
 import snakeToCamel from "../utils/snakeToCamel.js";
 

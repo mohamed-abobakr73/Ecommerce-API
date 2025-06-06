@@ -1,4 +1,4 @@
-import pool from "./connectToDb.js";
+import pool from "../configs/connectToDb.js";
 
 const findAllReviews = async (productId) => {
   const query = `

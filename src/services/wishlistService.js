@@ -1,4 +1,4 @@
-import pool from "./connectToDb.js";
+import pool from "../configs/connectToDb.js";
 
 const getAllwishlistItems = async (userId) => {
   const query = `

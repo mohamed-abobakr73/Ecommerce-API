@@ -1,4 +1,4 @@
-import pool from "./connectToDb.js";
+import pool from "../configs/connectToDb.js";
 
 const findAllCategories = async () => {
   const [categories] = await pool.query(`SELECT * FROM categories`);
