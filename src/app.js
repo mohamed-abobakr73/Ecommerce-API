@@ -1,17 +1,20 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import usersRouter from "./routes/usersRoute.js";
-import categoriesRouter from "./routes/categoriesRoute.js";
-import brandsRouter from "./routes/brandsRoute.js";
-import productsRouter from "./routes/productsRoute.js";
-import cartRouter from "./routes/cartsRoute.js";
-import stripeRouter from "./routes/stripeRoute.js";
-import ordersRouter from "./routes/ordersRoute.js";
-import discountsRouter from "./routes/discountsRoute.js";
-import wishlistRouter from "./routes/wishlistRoute.js";
-import reviewsRouter from "./routes/reviewsRoute.js";
-import addressesRouter from "./routes/addressesRoute.js";
+import {
+  usersRouter,
+  categoriesRouter,
+  brandsRouter,
+  productsRouter,
+  cartRouter,
+  stripeRouter,
+  ordersRouter,
+  discountsRouter,
+  wishlistRouter,
+  reviewsRouter,
+  addressesRouter,
+} from "./routes/index.js";
+
 import globalErrorHandler from "./middlewares/globalErrorHandler.js";
 
 const app = express();
