@@ -4,7 +4,7 @@ import Stripe from "stripe";
 import dotenv from "dotenv";
 import productsService from "../services/productsService.js";
 import ordersService from "../services/ordersService.js";
-import appError from "../utils/appError.js";
+import appError from "../utils/AppError.js";
 import httpStatusText from "../utils/httpStatusText.js";
 import checkIfUserExists from "../utils/checkIfUserExists.js";
 import discountsService from "../services/discountsService.js";

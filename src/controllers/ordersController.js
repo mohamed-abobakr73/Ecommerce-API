@@ -2,7 +2,7 @@ import { asyncWrapper } from "../middlewares/asyncWrapper.js";
 import { check, validationResult } from "express-validator";
 import cartService from "../services/cartService.js";
 import productsService from "../services/productsService.js";
-import appError from "../utils/appError.js";
+import appError from "../utils/AppError.js";
 import httpStatusText from "../utils/httpStatusText.js";
 import ordersService from "../services/ordersService.js";
 import checkIfUserExists from "../utils/checkIfUserExists.js";

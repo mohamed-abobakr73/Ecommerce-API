@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import httpStatusText from "../utils/httpStatusText.js";
-import appError from "../utils/appError.js";
+import appError from "../utils/AppError.js";
 
 const verifyToken = (req, res, next) => {
   const authHeaders =

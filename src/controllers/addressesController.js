@@ -1,6 +1,6 @@
 import { asyncWrapper } from "../middlewares/asyncWrapper.js";
 import { validationResult } from "express-validator";
-import appError from "../utils/appError.js";
+import appError from "../utils/AppError.js";
 import httpStatusText from "../utils/httpStatusText.js";
 import checkIfUserExists from "../utils/checkIfUserExists.js";
 import addressesService from "../services/addressesService.js";

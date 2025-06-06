@@ -1,4 +1,4 @@
-import appError from "../utils/appError.js";
+import appError from "../utils/AppError.js";
 import httpStatusText from "../utils/httpStatusText.js";
 
 const imageValidation = (req, res, next) => {

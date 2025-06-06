@@ -1,5 +1,5 @@
 import userServices from "../services/usersService.js";
-import appError from "./appError.js";
+import appError from "./AppError.js";
 import httpStatusText from "./httpStatusText.js";
 
 const checkIfUserExists = async (userId) => {

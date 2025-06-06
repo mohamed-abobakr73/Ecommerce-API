@@ -1,6 +1,6 @@
 import { validationResult } from "express-validator";
 import { asyncWrapper } from "../middlewares/asyncWrapper.js";
-import appError from "../utils/appError.js";
+import appError from "../utils/AppError.js";
 import httpStatusText from "../utils/httpStatusText.js";
 import productsService from "../services/productsService.js";
 import usersService from "../services/usersService.js";

@@ -1,5 +1,5 @@
 import { asyncWrapper } from "../middlewares/asyncWrapper.js";
-import appError from "../utils/appError.js";
+import appError from "../utils/AppError.js";
 import httpStatusText from "../utils/httpStatusText.js";
 import wishlistService from "../services/wishlistService.js";
 import checkIfUserExists from "../utils/checkIfUserExists.js";

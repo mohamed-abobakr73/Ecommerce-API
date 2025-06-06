@@ -1,7 +1,7 @@
 import { validationResult } from "express-validator";
 import bcrypt from "bcrypt";
 import { asyncWrapper } from "../middlewares/asyncWrapper.js";
-import appError from "../utils/appError.js";
+import appError from "../utils/AppError.js";
 import generateJwt from "../utils/generateJwt.js";
 import usersService from "../services/usersService.js";
 import httpStatusText from "../utils/httpStatusText.js";
