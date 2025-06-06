@@ -1,18 +1,23 @@
 import db from "../configs/connectToDb.js";
+import { discountsServiceQueries } from "../utils/sqlQueries/index.js";
+
+// TODO FIX the find discount query and logic
 
 const findAllDiscounts = async (sellerId) => {
-  const query = `
-    SELECT * FROM discounts WHERE seller_id = ?
-  `;
-  const [result] = await db.query(query, [sellerId]);
+  const query = discountsServiceQueries.findDiscountsQuery;
+
+  const queryParams = [sellerId];
+
+  const [result] = await db.execute(query, queryParams);
+
   return result;
 };
 
 const findDiscount = async (filters) => {
-  let query = `
-    SELECT * FROM discounts
-  `;
+  let query = discountsServiceQueries.findDiscountsQuery;
+
   let queryParams;
+
   if (Object.keys(filters).length > 0) {
     const conditions = Object.keys(filters)
       .map((key) => `${key} = ?`)
@@ -26,20 +31,14 @@ const findDiscount = async (filters) => {
 };
 
 const createDiscount = async (data) => {
-  const query = `
-  INSERT INTO discounts
-    (seller_id, code, discount_percentage, valid_from, valid_to)
-  VALUES
-    (?,?,?,?,?);
-  `;
   const { sellerId, code, discountPercentage, validFrom, validTo } = data;
-  const [result] = await db.execute(query, [
-    sellerId,
-    code,
-    discountPercentage,
-    validFrom,
-    validTo,
-  ]);
+
+  const query = discountsServiceQueries.createDiscountQuery;
+
+  const queryParams = [sellerId, code, discountPercentage, validFrom, validTo];
+
+  const [result] = await db.execute(query, queryParams);
+
   return result.affectedRows;
 };
 
