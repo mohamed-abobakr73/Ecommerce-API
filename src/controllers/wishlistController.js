@@ -1,5 +1,5 @@
 import { asyncWrapper } from "../middlewares/asyncWrapper.js";
-import appError from "../utils/AppError.js";
+import AppError from "../utils/AppError.js";
 import httpStatusText from "../utils/httpStatusText.js";
 import wishlistService from "../services/wishlistService.js";
 import checkIfUserExists from "../utils/checkIfUserExists.js";
@@ -9,7 +9,7 @@ const getAllWihslist = asyncWrapper(async (req, res, next) => {
   const { userId } = req.params;
   const userDoNotExist = await checkIfUserExists(userId);
   if (userDoNotExist) {
-    const error = appError.create("Invalid user id", 400, httpStatusText.ERROR);
+    const error = new AppError("Invalid user id", 400, httpStatusText.ERROR);
     return next(error);
   }
 
@@ -27,17 +27,13 @@ const addOrRemoveItemToWishlist = asyncWrapper(async (req, res, next) => {
   const userDoNotExist = await checkIfUserExists(userId);
 
   if (userDoNotExist) {
-    const error = appError.create("Invalid user id", 400, httpStatusText.ERROR);
+    const error = new AppError("Invalid user id", 400, httpStatusText.ERROR);
     return next(error);
   }
 
   const validProductId = await productsService.findProduct(productId);
   if (!validProductId) {
-    const error = appError.create(
-      "Invalid product id",
-      400,
-      httpStatusText.FAIL
-    );
+    const error = new AppError("Invalid product id", 400, httpStatusText.FAIL);
     return next(error);
   }
 

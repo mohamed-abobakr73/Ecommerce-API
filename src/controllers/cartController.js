@@ -2,7 +2,7 @@ import { asyncWrapper } from "../middlewares/asyncWrapper.js";
 import { validationResult } from "express-validator";
 import cartService from "../services/cartService.js";
 import productsService from "../services/productsService.js";
-import appError from "../utils/AppError.js";
+import AppError from "../utils/AppError.js";
 import httpStatusText from "../utils/httpStatusText.js";
 
 const getCartItems = asyncWrapper(async (req, res, next) => {
@@ -10,7 +10,7 @@ const getCartItems = asyncWrapper(async (req, res, next) => {
   const cart = await cartService.findCartItems(userId);
 
   if (!cart) {
-    const error = appError.create("Invalid user id", 400, httpStatusText.ERROR);
+    const error = new AppError("Invalid user id", 400, httpStatusText.ERROR);
     return next(error);
   }
 
@@ -36,23 +36,19 @@ const addItemToCart = asyncWrapper(async (req, res, next) => {
   const cartId = await cartService.findCartId(userId);
 
   if (!cartId) {
-    const error = appError.create("Invalid user id", 400, httpStatusText.ERROR);
+    const error = new AppError("Invalid user id", 400, httpStatusText.ERROR);
     return next(error);
   }
 
   const productExists = await productsService.findProduct(productId);
   if (!productExists) {
-    const error = appError.create(
-      "Invalid product id",
-      400,
-      httpStatusText.ERROR
-    );
+    const error = new AppError("Invalid product id", 400, httpStatusText.ERROR);
     return next(error);
   }
 
   const productStockQuantity = productExists.stockQuantity;
   if (!(productStockQuantity > 0 || productStockQuantity >= quantity)) {
-    const error = appError.create(
+    const error = new AppError(
       "Not enough product stock qunatity for the requested quantity",
       400,
       httpStatusText.ERROR
@@ -67,7 +63,7 @@ const addItemToCart = asyncWrapper(async (req, res, next) => {
   );
 
   if (!result) {
-    const error = appError.create(
+    const error = new AppError(
       "Something went wrong, please try again",
       500,
       httpStatusText.ERROR
@@ -87,7 +83,7 @@ const updateCartItemQuantity = asyncWrapper(async (req, res, next) => {
   const errors = validationResult(req.body);
 
   if (!errors.isEmpty()) {
-    const error = appError.create(errors.array(), 400, httpStatusText.FAIL);
+    const error = new AppError(errors.array(), 400, httpStatusText.FAIL);
     return next(error);
   }
 
@@ -97,7 +93,7 @@ const updateCartItemQuantity = asyncWrapper(async (req, res, next) => {
   });
 
   if (!result) {
-    const error = appError.create(
+    const error = new AppError(
       "Invalid cart item id",
       400,
       httpStatusText.ERROR
@@ -115,7 +111,7 @@ const deleteCartItem = asyncWrapper(async (req, res, next) => {
   const result = await cartService.deleteItemFromCart(+cartItemId);
 
   if (!result) {
-    const error = appError.create(
+    const error = new AppError(
       "Invalid cart item id",
       400,
       httpStatusText.FAIL

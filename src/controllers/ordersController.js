@@ -2,7 +2,7 @@ import { asyncWrapper } from "../middlewares/asyncWrapper.js";
 import { check, validationResult } from "express-validator";
 import cartService from "../services/cartService.js";
 import productsService from "../services/productsService.js";
-import appError from "../utils/AppError.js";
+import AppError from "../utils/AppError.js";
 import httpStatusText from "../utils/httpStatusText.js";
 import ordersService from "../services/ordersService.js";
 import checkIfUserExists from "../utils/checkIfUserExists.js";
@@ -48,11 +48,7 @@ const getOrder = asyncWrapper(async (req, res, next) => {
 
   const order = await ordersService.findOrder(orderId);
   if (!order) {
-    const error = appError.create(
-      "Invalid order id",
-      400,
-      httpStatusText.ERROR
-    );
+    const error = new AppError("Invalid order id", 400, httpStatusText.ERROR);
     return next(error);
   }
 

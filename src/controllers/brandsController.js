@@ -1,6 +1,6 @@
 import { validationResult } from "express-validator";
 import { asyncWrapper } from "../middlewares/asyncWrapper.js";
-import appError from "../utils/AppError.js";
+import AppError from "../utils/AppError.js";
 import httpStatusText from "../utils/httpStatusText.js";
 import brandsService from "../services/brandsService.js";
 
@@ -16,7 +16,7 @@ const getBrand = asyncWrapper(async (req, res, next) => {
   const brand = await brandsService.findBrand(brandId);
 
   if (!brand) {
-    const error = appError.create("Brand not found", 400, httpStatusText.FAIL);
+    const error = new AppError("Brand not found", 400, httpStatusText.FAIL);
     return next(error);
   }
 
@@ -30,7 +30,7 @@ const createBrand = asyncWrapper(async (req, res, next) => {
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    const error = appError.create(errors.array(), 400, httpStatusText.FAIL);
+    const error = new AppError(errors.array(), 400, httpStatusText.FAIL);
     return next(error);
   }
 
@@ -56,7 +56,7 @@ const updateBrand = asyncWrapper(async (req, res, next) => {
   );
 
   if (!findBrandAndUpdate) {
-    const error = appError.create("Invalid Brand id", 400, httpStatusText.FAIL);
+    const error = new AppError("Invalid Brand id", 400, httpStatusText.FAIL);
     return next(error);
   }
 
@@ -72,7 +72,7 @@ const deleteBrand = asyncWrapper(async (req, res, next) => {
   const findBrandAndDelete = await brandsService.deleteBrand(brandId);
 
   if (!findBrandAndDelete) {
-    const error = appError.create("Invalid Brand id", 400, httpStatusText.FAIL);
+    const error = new AppError("Invalid Brand id", 400, httpStatusText.FAIL);
     return next(error);
   }
 

@@ -1,6 +1,6 @@
 import { validationResult } from "express-validator";
 import { asyncWrapper } from "../middlewares/asyncWrapper.js";
-import appError from "../utils/AppError.js";
+import AppError from "../utils/AppError.js";
 import httpStatusText from "../utils/httpStatusText.js";
 import productsService from "../services/productsService.js";
 import usersService from "../services/usersService.js";
@@ -20,11 +20,7 @@ const getProduct = asyncWrapper(async (req, res, next) => {
   const productData = await productsService.findProduct(productId);
 
   if (!productData) {
-    const error = appError.create(
-      "Product not found",
-      400,
-      httpStatusText.FAIL
-    );
+    const error = new AppError("Product not found", 400, httpStatusText.FAIL);
     return next(error);
   }
   const { sellerId } = productData;
@@ -52,7 +48,7 @@ const createProduct = asyncWrapper(async (req, res, next) => {
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    const error = appError.create(errors.array(), 400, httpStatusText.FAIL);
+    const error = new AppError(errors.array(), 400, httpStatusText.FAIL);
     return next(error);
   }
 
@@ -66,7 +62,7 @@ const createProduct = asyncWrapper(async (req, res, next) => {
   });
 
   if (!newProductId) {
-    const error = appError.create(
+    const error = new AppError(
       "Failed to create product, please try again",
       400,
       httpStatusText.FAIL
@@ -102,7 +98,7 @@ const updateProduct = asyncWrapper(async (req, res, next) => {
   const { productId } = req.params;
 
   if (!Object.keys(req.body).length) {
-    const error = appError.create(
+    const error = new AppError(
       "No fields to update provided",
       400,
       httpStatusText.FAIL
@@ -118,11 +114,7 @@ const updateProduct = asyncWrapper(async (req, res, next) => {
   const isUpdated = await productsService.updateProduct(productId, req.body);
 
   if (!isUpdated) {
-    const error = appError.create(
-      "Invalid product id",
-      400,
-      httpStatusText.FAIL
-    );
+    const error = new AppError("Invalid product id", 400, httpStatusText.FAIL);
     return next(error);
   }
 
@@ -139,11 +131,7 @@ const deleteProduct = asyncWrapper(async (req, res, next) => {
   const findProductAndDelete = await productsService.deleteProduct(productId);
 
   if (!findProductAndDelete) {
-    const error = appError.create(
-      "Invalid Product id",
-      400,
-      httpStatusText.FAIL
-    );
+    const error = new AppError("Invalid Product id", 400, httpStatusText.FAIL);
     return next(error);
   }
 

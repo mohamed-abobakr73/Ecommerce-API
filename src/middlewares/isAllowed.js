@@ -1,11 +1,11 @@
-import appError from "../utils/AppError.js";
+import AppError from "../utils/AppError.js";
 import httpStatusText from "../utils/httpStatusText.js";
 
 const isAllowed = (...roles) => {
   return (req, res, next) => {
     const role = req.currentUser.role;
     if (!roles.includes(role)) {
-      const error = appError.create(
+      const error = new AppError(
         "You are not allowed to do this action",
         401,
         httpStatusText.FAIL

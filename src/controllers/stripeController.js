@@ -4,7 +4,7 @@ import Stripe from "stripe";
 import dotenv from "dotenv";
 import productsService from "../services/productsService.js";
 import ordersService from "../services/ordersService.js";
-import appError from "../utils/AppError.js";
+import AppError from "../utils/AppError.js";
 import httpStatusText from "../utils/httpStatusText.js";
 import checkIfUserExists from "../utils/checkIfUserExists.js";
 import discountsService from "../services/discountsService.js";
@@ -16,13 +16,13 @@ const stripePayment = asyncWrapper(async (req, res, next) => {
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    const error = appError.create(errors.array(), 400, httpStatusText.ERROR);
+    const error = new AppError(errors.array(), 400, httpStatusText.ERROR);
     return next(error);
   }
 
   const userDoNotExist = await checkIfUserExists(userId);
   if (userDoNotExist) {
-    const error = appError.create("Invalid user id", 400, httpStatusText.ERROR);
+    const error = new AppError("Invalid user id", 400, httpStatusText.ERROR);
     return next(error);
   }
 
@@ -36,7 +36,7 @@ const stripePayment = asyncWrapper(async (req, res, next) => {
     });
 
     if (!discountData) {
-      const error = appError.create(
+      const error = new AppError(
         "Invalid discount code",
         400,
         httpStatusText.FAIL
@@ -59,7 +59,7 @@ const stripePayment = asyncWrapper(async (req, res, next) => {
   );
 
   if (invalidProductsIds.length > 0) {
-    const error = appError.create(
+    const error = new AppError(
       `Invalid product id${
         invalidProductsIds.length > 1 ? "s" : ""
       } ${invalidProductsIds.join(", ")}`,

@@ -1,7 +1,7 @@
 import { validationResult } from "express-validator";
 import bcrypt from "bcrypt";
 import { asyncWrapper } from "../middlewares/asyncWrapper.js";
-import appError from "../utils/AppError.js";
+import AppError from "../utils/AppError.js";
 import generateJwt from "../utils/generateJwt.js";
 import usersService from "../services/usersService.js";
 import httpStatusText from "../utils/httpStatusText.js";
@@ -21,7 +21,7 @@ const getUser = asyncWrapper(async (req, res, next) => {
 
   // Checking if the uesr exists.
   if (!user) {
-    const error = appError.create("User not found", 400, httpStatusText.FAIL);
+    const error = new AppError("User not found", 400, httpStatusText.FAIL);
     return next(error);
   }
 
@@ -37,14 +37,14 @@ const createUser = asyncWrapper(async (req, res, next) => {
   // Validating the request body.
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    const error = appError.create(errors.array(), 400, httpStatusText.FAIL);
+    const error = new AppError(errors.array(), 400, httpStatusText.FAIL);
     return next(error);
   }
 
   // Checking if the use aleardy registered.
   const userExists = await usersService.findUser({ email });
   if (userExists) {
-    const error = appError.create(
+    const error = new AppError(
       "This user is already registerd",
       400,
       httpStatusText.FAIL
@@ -54,7 +54,7 @@ const createUser = asyncWrapper(async (req, res, next) => {
 
   // Checking if the the password and confirm password is matched.
   if (!(password === confirmPassword)) {
-    const error = appError.create(
+    const error = new AppError(
       "Password and confirm password do not match.",
       400,
       httpStatusText.FAIL
@@ -102,25 +102,21 @@ const login = asyncWrapper(async (req, res, next) => {
   const { email, password } = req.body;
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    const error = appError.create(errors.array(), 400, httpStatusText.FAIL);
+    const error = new AppError(errors.array(), 400, httpStatusText.FAIL);
     return next(error);
   }
 
   const user = await usersService.findUser({ email }, true);
 
   if (!user) {
-    const error = appError.create(
-      "User is not found.",
-      400,
-      httpStatusText.FAIL
-    );
+    const error = new AppError("User is not found.", 400, httpStatusText.FAIL);
     return next(error);
   }
 
   const matchedPassword = await bcrypt.compareSync(password, user.password);
 
   if (!matchedPassword) {
-    const error = appError.create(
+    const error = new AppError(
       "Wrong password, please try again.",
       400,
       httpStatusText.FAIL

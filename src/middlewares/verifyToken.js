@@ -1,13 +1,13 @@
 import jwt from "jsonwebtoken";
 import httpStatusText from "../utils/httpStatusText.js";
-import appError from "../utils/AppError.js";
+import AppError from "../utils/AppError.js";
 
 const verifyToken = (req, res, next) => {
   const authHeaders =
     req.headers["Authorization"] || req.headers["authorization"];
 
   if (!authHeaders) {
-    const error = appError.create(
+    const error = new AppError(
       "No JWT token provided.",
       401,
       httpStatusText.ERROR
@@ -23,11 +23,7 @@ const verifyToken = (req, res, next) => {
     req.currentUser = currentUser;
     next();
   } catch (err) {
-    const error = appError.create(
-      "Invalid JWT token.",
-      401,
-      httpStatusText.ERROR
-    );
+    const error = new AppError("Invalid JWT token.", 401, httpStatusText.ERROR);
     return next(error);
   }
 };

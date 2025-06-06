@@ -1,5 +1,5 @@
 import { asyncWrapper } from "../middlewares/asyncWrapper.js";
-import appError from "../utils/AppError.js";
+import AppError from "../utils/AppError.js";
 import httpStatusText from "../utils/httpStatusText.js";
 import checkIfUserExists from "../utils/checkIfUserExists.js";
 import { validationResult } from "express-validator";
@@ -11,11 +11,7 @@ const getAllReviews = asyncWrapper(async (req, res, next) => {
 
   const validProductId = await productsService.findProduct(+productId);
   if (!validProductId) {
-    const error = appError.create(
-      "Invalid product id",
-      400,
-      httpStatusText.FAIL
-    );
+    const error = new AppError("Invalid product id", 400, httpStatusText.FAIL);
     return next(error);
   }
 
@@ -31,32 +27,26 @@ const createReview = asyncWrapper(async (req, res, next) => {
   const userDoNotExist = await checkIfUserExists(userId);
 
   if (userDoNotExist) {
-    const error = appError.create("Invalid user id", 400, httpStatusText.ERROR);
+    const error = new AppError("Invalid user id", 400, httpStatusText.ERROR);
     return next(error);
   }
 
   const validProductId = await productsService.findProduct(productId);
   if (!validProductId) {
-    const error = appError.create(
-      "Invalid product id",
-      400,
-      httpStatusText.FAIL
-    );
+    const error = new AppError("Invalid product id", 400, httpStatusText.FAIL);
     return next(error);
   }
 
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    const error = appError.create(errors.array(), 400, httpStatusText.FAIL);
+    const error = new AppError(errors.array(), 400, httpStatusText.FAIL);
     return next(error);
   }
 
   const addedReview = await reviewsService.addReview(req.body);
   if (!addedReview) {
-    const error = appError.create(
-      "Something went wrong, please try again later"
-    );
+    const error = new AppError("Something went wrong, please try again later");
     return next(error);
   }
 
