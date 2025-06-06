@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import initializeDatabase from "./configs/initializeDatabase.js";
 import {
   usersRouter,
   categoriesRouter,
@@ -24,6 +25,9 @@ dotenv.config(); // To read from env files.
 app.use(cors()); // To enable cors for all website and this should be modified on production.
 
 app.use(express.json()); // Parsing request body to json format.
+
+// Initialize database
+initializeDatabase();
 
 // Routes
 app.use("/api/users", usersRouter);

@@ -1,4 +1,4 @@
-import db from "../configs/connectToDb";
+import db from "../configs/connectToDb.js";
 
 const createOrdersTable = async () => {
   try {

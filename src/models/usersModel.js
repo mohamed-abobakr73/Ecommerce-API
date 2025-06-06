@@ -1,4 +1,4 @@
-import db from "../configs/connectToDb";
+import db from "../configs/connectToDb.js";
 
 const createUsersTable = async () => {
   try {
@@ -15,7 +15,6 @@ const createUsersTable = async () => {
         FOREIGN KEY (role_id) REFERENCES roles(role_id)
       );
     `);
-    console.log("users table ready");
   } catch (error) {
     console.error("users table error:", error);
   }
