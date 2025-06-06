@@ -33,6 +33,15 @@ const registerUserValidation = () => [
     .withMessage("Password must contain at least one number")
     .matches(/[\W_]/)
     .withMessage("Password must contain at least one special character"),
+  body("confirmPassword")
+    .notEmpty()
+    .withMessage("Confirm password is required")
+    .custom((value, { req }) => {
+      if (value !== req.body.password) {
+        throw new Error("Password and confirm password do not match");
+      }
+      return true;
+    }),
   body("phone")
     .notEmpty()
     .withMessage("Phone number is required")
