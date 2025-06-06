@@ -1,7 +1,7 @@
 import { Router } from "express";
 import {
   getAllUsers,
-  getUser,
+  findUser,
   createUser,
   login,
 } from "../controllers/usersController.js";
@@ -17,7 +17,7 @@ usersRouter
   .route("/")
   .get(verifyToken, isAllowed(usersRoles.ADMIN), getAllUsers);
 
-usersRouter.route("/:userId").get(getUser);
+usersRouter.route("/:userId").get(findUser);
 
 usersRouter.route("/register").post(registerUserValidation(), createUser);
 

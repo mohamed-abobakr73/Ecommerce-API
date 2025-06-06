@@ -1,4 +1,5 @@
 import db from "../configs/connectToDb.js";
+import AppError from "../utils/AppError.js";
 import { usersServiceQueries } from "../utils/sqlQueries/index.js";
 
 const findAllUsers = async (filters = null) => {
@@ -6,29 +7,45 @@ const findAllUsers = async (filters = null) => {
   return users;
 };
 
-const findUser = async (filters, includePassword = false) => {
-  let selectedFields = usersServiceQueries.findUserSelectedFields;
+const createWhereConditions = (filters) => {
+  const conditions = Object.keys(filters)
+    .map((key) => `${key} = ?`)
+    .join(" AND ");
+  const queryParams = Object.values(filters);
+  return { whereClause: ` WHERE ${conditions}`, queryParams };
+};
 
-  if (includePassword) {
-    selectedFields += ", password";
+const findUserService = async (filters, includePassword = false) => {
+  try {
+    let selectedFields = usersServiceQueries.findUserSelectedFields;
+
+    if (includePassword) {
+      selectedFields += ", password";
+    }
+
+    let query = usersServiceQueries.findUserQuery(selectedFields);
+
+    let queryParams = [];
+
+    const filterKeys = Object.keys(filters);
+
+    if (filterKeys.length > 0) {
+      const { whereClause, queryParams } = createWhereConditions(filters);
+      query += whereClause;
+      queryParams = queryParams;
+    }
+
+    const user = await db.execute(query, queryParams);
+
+    if (!user) {
+      const error = new AppError("User not found", 400, httpStatusText.FAIL);
+      throw error;
+    }
+
+    return user[0][0];
+  } catch (error) {
+    throw error;
   }
-
-  let query = usersServiceQueries.findUserQuery(selectedFields);
-
-  let queryParams = [];
-
-  // Add filters if provided
-  if (Object.keys(filters).length > 0) {
-    const conditions = Object.keys(filters)
-      .map((key) => `${key} = ?`)
-      .join(" AND ");
-    query += ` WHERE ${conditions}`;
-    queryParams = Object.values(filters);
-  }
-
-  // Execute query
-  const user = await db.execute(query, queryParams);
-  return user[0][0];
 };
 
 const addNewUser = async (userData) => {
@@ -44,8 +61,9 @@ const addNewUser = async (userData) => {
   ];
 
   const [user] = await db.execute(query, queryParams);
+
   const userId = user.insertId;
   return userId;
 };
 
-export default { findAllUsers, findUser, addNewUser };
+export default { findAllUsers, findUserService, addNewUser };

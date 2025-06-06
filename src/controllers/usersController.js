@@ -12,18 +12,10 @@ const getAllUsers = asyncWrapper(async (req, res, next) => {
   return res.json({ status: httpStatusText.SUCCESS, data: users });
 });
 
-const getUser = asyncWrapper(async (req, res, next) => {
-  // Extrcting the user id.
+const findUser = asyncWrapper(async (req, res, next) => {
   const { userId } = req.params;
 
-  // Getting the user form the database.
-  const user = await usersService.findUser({ user_id: userId });
-
-  // Checking if the uesr exists.
-  if (!user) {
-    const error = new AppError("User not found", 400, httpStatusText.FAIL);
-    return next(error);
-  }
+  const user = await usersService.findUserService({ user_id: userId });
 
   return res
     .status(200)
@@ -138,4 +130,4 @@ const login = asyncWrapper(async (req, res, next) => {
     .json({ status: httpStatusText.SUCCESS, data: { user: userData, token } });
 });
 
-export { getAllUsers, getUser, createUser, login };
+export { getAllUsers, findUser, createUser, login };
