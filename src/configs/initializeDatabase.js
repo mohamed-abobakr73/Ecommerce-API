@@ -14,6 +14,7 @@ import {
   createPaymentsTable,
   createAddressesTable,
 } from "../models/index.js";
+import { seedRoles } from "../utils/sqlQueries/index.js";
 import db from "./connectToDb.js";
 
 const initializeDatabase = async () => {
@@ -43,6 +44,8 @@ const initializeDatabase = async () => {
     await createReviewsTable();
 
     await createAddressesTable();
+
+    await seedRoles();
 
     console.log("Database initialized successfully");
   } catch (error) {
