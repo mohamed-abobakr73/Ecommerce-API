@@ -1,41 +1,28 @@
 import db from "../configs/connectToDb.js";
+import { addressesServiceQueries } from "../utils/sqlQueries/index.js";
 
 const findAllAddresses = async (userId) => {
-  const query = `
-    SELECT * FROM addresses WHERE user_id = ?
-  `;
-  const [result] = await db.query(query, [userId]);
+  const query = addressesServiceQueries.findAllAddressesQuery;
+
+  const [result] = await db.execute(query, [userId]);
+
   return result;
 };
 
-const addAddress = async (data) => {
-  const {
-    userId,
-    addressLine1,
-    addressLine2,
-    country,
-    state,
-    city,
-    isDefault,
-  } = data;
+const addAddress = async (addressData) => {
+  const query = addressesServiceQueries.addAddressQuery;
 
-  const query = `
-    INSERT INTO 
-    addresses
-      (user_id, address_line_1, address_line_2, country, state, city, is_default)
-    VALUES
-      (?, ?, ?, ?, ?, ?, ?)
-  `;
+  const queryParams = [
+    addressData.userId,
+    addressData.addressLine1,
+    addressData.addressLine2,
+    addressData.country,
+    addressData.state,
+    addressData.city,
+    addressData.isDefault || true,
+  ];
 
-  const [result] = await db.query(query, [
-    userId,
-    addressLine1,
-    addressLine2,
-    country,
-    state,
-    city,
-    isDefault || true,
-  ]);
+  const [result] = await db.query(query, queryParams);
 
   return result.affectedRows;
 };

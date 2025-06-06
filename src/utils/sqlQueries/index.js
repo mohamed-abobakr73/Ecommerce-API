@@ -1,4 +1,4 @@
 import usersServiceQueries from "./usersServiceQueries.js";
 import productsServiceQueries from "./productsServiceQueries.js";
-
-export { usersServiceQueries, productsServiceQueries };
+import addressesServiceQueries from "./addressesServiceQueries.js";
+export { usersServiceQueries, productsServiceQueries, addressesServiceQueries };
