@@ -1,4 +1,4 @@
-const createOrderItemsModel = async () => {
+const createOrderItemsTable = async () => {
   try {
     await db.query(`
       CREATE TABLE IF NOT EXISTS order_items (
@@ -16,4 +16,4 @@ const createOrderItemsModel = async () => {
   }
 };
 
-export default createOrderItemsModel;
+export default createOrderItemsTable;
