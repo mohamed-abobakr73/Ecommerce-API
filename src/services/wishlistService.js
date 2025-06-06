@@ -1,4 +1,4 @@
-import pool from "../configs/connectToDb.js";
+import db from "../configs/connectToDb.js";
 
 const getAllwishlistItems = async (userId) => {
   const query = `
@@ -24,7 +24,7 @@ FROM
 WHERE
   user_id = ?;
   `;
-  const [result] = await pool.query(query, [userId]);
+  const [result] = await db.query(query, [userId]);
   return result;
 };
 
@@ -34,7 +34,7 @@ const findWishlistItem = async (data) => {
     SELECT * FROM wishlist WHERE user_id = ? AND product_id = ?
   `;
 
-  const [[result]] = await pool.query(query, [userId, productId]);
+  const [[result]] = await db.query(query, [userId, productId]);
   return result;
 };
 
@@ -46,7 +46,7 @@ const addItemToWishlist = async (data) => {
     VALUES
       (?, ?)
   `;
-  const [result] = await pool.query(query, [userId, productId]);
+  const [result] = await db.query(query, [userId, productId]);
   return result.affectedRows;
 };
 
@@ -55,7 +55,7 @@ const removeItemFromWishlist = async (data) => {
   const query = `
   DELETE FROM wishlist WHERE user_id = ? AND product_id = ?
 `;
-  const [result] = await pool.query(query, [userId, productId]);
+  const [result] = await db.query(query, [userId, productId]);
   return result.affectedRows;
 };
 

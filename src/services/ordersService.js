@@ -1,7 +1,7 @@
-import pool from "../configs/connectToDb.js";
+import db from "../configs/connectToDb.js";
 import snakeToCamel from "../utils/snakeToCamel.js";
 const findOrderId = async (userId) => {
-  const [result] = await pool.query(
+  const [result] = await db.query(
     `SELECT order_id FROM orders WHERE user_id = ?`,
     [userId]
   );
@@ -37,7 +37,7 @@ const findAllOrderItems = async (orderIds) => {
     order_items.order_id IN (${orderIds.map(() => "?").join(", ")});
   `;
 
-  const [result] = await pool.execute(query, orderIds);
+  const [result] = await db.execute(query, orderIds);
   return result;
 };
 
@@ -45,7 +45,7 @@ const findAllOrders = async (userId) => {
   const query = `
   SELECT * FROM orders WHERE user_id = ?
   `;
-  const [result] = await pool.execute(query, [userId]);
+  const [result] = await db.execute(query, [userId]);
   return result;
 };
 
@@ -53,7 +53,7 @@ const findOrder = async (orderId) => {
   const query = `
   SELECT * FROM orders WHERE order_id = ?
   `;
-  const [[result]] = await pool.query(query, [orderId]);
+  const [[result]] = await db.query(query, [orderId]);
   return result;
 };
 
@@ -67,12 +67,12 @@ const createOrder = async (data) => {
   if (!values[values.length - 1]) {
     values[values.length - 1] = null;
   }
-  const [result] = await pool.execute(query, values);
+  const [result] = await db.execute(query, values);
   return result.insertId;
 };
 
 const createOrderItems = async (items) => {
-  const [result] = pool.query(
+  const [result] = db.query(
     `INSERT INTO order_items (order_id, product_id, quantity) VALUES ?`,
     [items]
   );

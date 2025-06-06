@@ -1,10 +1,10 @@
-import pool from "../configs/connectToDb.js";
+import db from "../configs/connectToDb.js";
 
 const findAllDiscounts = async (sellerId) => {
   const query = `
     SELECT * FROM discounts WHERE seller_id = ?
   `;
-  const [result] = await pool.query(query, [sellerId]);
+  const [result] = await db.query(query, [sellerId]);
   return result;
 };
 
@@ -21,7 +21,7 @@ const findDiscount = async (filters) => {
     queryParams = Object.values(filters);
   }
 
-  const [[result]] = await pool.execute(query, queryParams);
+  const [[result]] = await db.execute(query, queryParams);
   return result;
 };
 
@@ -33,7 +33,7 @@ const createDiscount = async (data) => {
     (?,?,?,?,?);
   `;
   const { sellerId, code, discountPercentage, validFrom, validTo } = data;
-  const [result] = await pool.execute(query, [
+  const [result] = await db.execute(query, [
     sellerId,
     code,
     discountPercentage,

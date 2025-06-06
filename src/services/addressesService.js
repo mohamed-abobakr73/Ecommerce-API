@@ -1,10 +1,10 @@
-import pool from "../configs/connectToDb.js";
+import db from "../configs/connectToDb.js";
 
 const findAllAddresses = async (userId) => {
   const query = `
     SELECT * FROM addresses WHERE user_id = ?
   `;
-  const [result] = await pool.query(query, [userId]);
+  const [result] = await db.query(query, [userId]);
   return result;
 };
 
@@ -27,7 +27,7 @@ const addAddress = async (data) => {
       (?, ?, ?, ?, ?, ?, ?)
   `;
 
-  const [result] = await pool.query(query, [
+  const [result] = await db.query(query, [
     userId,
     addressLine1,
     addressLine2,

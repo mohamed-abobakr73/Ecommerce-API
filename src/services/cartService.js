@@ -1,7 +1,7 @@
-import pool from "../configs/connectToDb.js";
+import db from "../configs/connectToDb.js";
 
 const findCartId = async (userId) => {
-  const [[{ cart_id: cartId }]] = await pool.query(
+  const [[{ cart_id: cartId }]] = await db.query(
     `SELECT cart_id from cart WHERE user_id  = ?`,
     [userId]
   );
@@ -15,7 +15,7 @@ const findCartItems = async (userId) => {
     return;
   }
 
-  const [cartItems] = await pool.query(
+  const [cartItems] = await db.query(
     `
   SELECT 
     cart_items.*, products.*
@@ -35,7 +35,7 @@ const findCartItems = async (userId) => {
 };
 
 const createUserCart = async (userId) => {
-  const [result] = await pool.query(
+  const [result] = await db.query(
     `INSERT INTO 
     cart
       (user_id)
@@ -71,7 +71,7 @@ const addItemToCart = async (data) => {
       newQuantity = currentProductQuantity + quantity;
     }
 
-    const [result] = await pool.execute(query, [newQuantity, productId]);
+    const [result] = await db.execute(query, [newQuantity, productId]);
 
     return { result: result.affectedRows, quantity: newQuantity };
   } else {
@@ -81,7 +81,7 @@ const addItemToCart = async (data) => {
       (?, ?, ?)
     `;
 
-    const [result] = await pool.execute(query, [cartId, productId, quantity]);
+    const [result] = await db.execute(query, [cartId, productId, quantity]);
 
     return { result: result.affectedRows, quantity };
   }
@@ -90,13 +90,13 @@ const addItemToCart = async (data) => {
 const updateCartItemQuantity = async (data) => {
   const { cartItemId, quantity } = data;
   const query = `UPDATE cart_items SET quantity = ? WHERE cart_items_id = ?`;
-  const [result] = await pool.execute(query, [quantity, cartItemId]);
+  const [result] = await db.execute(query, [quantity, cartItemId]);
   return result.affectedRows;
 };
 
 const deleteItemFromCart = async (id) => {
   const query = `DELETE FROM cart_items WHERE cart_items_id = ?`;
-  const [result] = await pool.execute(query, [id]);
+  const [result] = await db.execute(query, [id]);
   return result.affectedRows;
 };
 

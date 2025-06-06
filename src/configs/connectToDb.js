@@ -8,7 +8,7 @@ const DATABASE_USER = process.env.DATABASE_USER;
 const DATABASE_PASSWORD = process.env.DATABASE_PASSWORD;
 const DATABASE_NAME = process.env.DATABASE_NAME;
 
-const pool = mysql
+const db = mysql
   .createPool({
     host: DATABASE_HOST,
     user: DATABASE_USER,
@@ -17,4 +17,4 @@ const pool = mysql
   })
   .promise();
 
-export default pool;
+export default db;

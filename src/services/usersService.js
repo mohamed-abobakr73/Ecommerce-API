@@ -1,8 +1,8 @@
-import pool from "../configs/connectToDb.js";
+import db from "../configs/connectToDb.js";
 import snakeToCamel from "../utils/snakeToCamel.js";
 
 const findAllUsers = async (filters = null) => {
-  const [users] = await pool.query(`SELECT 
+  const [users] = await db.query(`SELECT 
   user_id as userId, first_name as firstName, last_name as lastName, email, phone, role_name as role
 FROM
   users
@@ -40,7 +40,7 @@ const findUser = async (filters, includePassword = false) => {
   }
 
   // Execute query
-  const user = await pool.execute(query, queryParams);
+  const user = await db.execute(query, queryParams);
   return user[0][0];
 };
 
@@ -59,7 +59,7 @@ const addNewUser = async (userData) => {
     userData.role,
   ];
 
-  const [user] = await pool.execute(query, queryParams);
+  const [user] = await db.execute(query, queryParams);
   const userId = user.insertId;
   return userId;
 };

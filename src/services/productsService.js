@@ -1,4 +1,4 @@
-import pool from "../configs/connectToDb.js";
+import db from "../configs/connectToDb.js";
 import camelToSnake from "../utils/camelToSnake.js";
 import snakeToCamel from "../utils/snakeToCamel.js";
 
@@ -24,14 +24,14 @@ FROM
   images ON products.product_image = images.image_id`;
 
 const findAllProducts = async () => {
-  const [products] = await pool.query(
+  const [products] = await db.query(
     getProductsQuery + " ORDER BY product_id ASC;"
   );
   return products;
 };
 
 const findProductsByIds = async (ids) => {
-  const [result] = await pool.query(
+  const [result] = await db.query(
     getProductsQuery +
       ` WHERE product_id IN (${ids
         .map(() => "?")
@@ -44,7 +44,7 @@ const findProductsByIds = async (ids) => {
 const findProduct = async (id) => {
   const query = getProductsQuery + " WHERE product_id = ?;";
 
-  const [[productData]] = await pool.execute(query, [id]);
+  const [[productData]] = await db.execute(query, [id]);
   return productData;
 };
 
@@ -66,7 +66,7 @@ const addNewProduct = async (product) => {
   values
     (?, ?, ?, ?, ?, ?, ?, ?)`;
 
-  const [result] = await pool.execute(query, [
+  const [result] = await db.execute(query, [
     productName,
     productDescription,
     price,
@@ -93,13 +93,13 @@ const updateProduct = async (id, data) => {
   )}
     WHERE product_id = ?
   `;
-  const [result] = await pool.execute(query, [...fieldsValues, id]);
+  const [result] = await db.execute(query, [...fieldsValues, id]);
   return result.affectedRows;
 };
 
 const deleteProduct = async (id) => {
   const query = `DELETE FROM products WHERE product_id = ?`;
-  const [result] = await pool.execute(query, [id]);
+  const [result] = await db.execute(query, [id]);
   return result.affectedRows;
 };
 
@@ -117,7 +117,7 @@ const decrementProductStockQunatity = async (products) => {
     .flatMap((product) => [product.id, product.quantity])
     .concat(products.map((product) => product.id));
 
-  const [result] = await pool.execute(query, values);
+  const [result] = await db.execute(query, values);
   return result.affectedRows;
 };
 

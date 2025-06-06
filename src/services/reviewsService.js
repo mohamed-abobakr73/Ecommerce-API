@@ -1,4 +1,4 @@
-import pool from "../configs/connectToDb.js";
+import db from "../configs/connectToDb.js";
 
 const findAllReviews = async (productId) => {
   const query = `
@@ -16,7 +16,7 @@ const findAllReviews = async (productId) => {
 
   `;
 
-  const [result] = await pool.query(query, [productId]);
+  const [result] = await db.query(query, [productId]);
   return result;
 };
 
@@ -29,7 +29,7 @@ const addReview = async (data) => {
     VALUES 
       (?, ?, ?, ?);
 `;
-  const [result] = await pool.query(query, [
+  const [result] = await db.query(query, [
     userId,
     productId,
     rating,
