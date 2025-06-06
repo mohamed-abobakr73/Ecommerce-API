@@ -6,9 +6,8 @@ const createCategoriesTable = async () => {
         category_name VARCHAR(50) NOT NULL
       );
     `);
-    console.log("✅ categories table ready");
   } catch (error) {
-    console.error("❌ categories table error:", error);
+    console.error("categories table error:", error);
   }
 };
 

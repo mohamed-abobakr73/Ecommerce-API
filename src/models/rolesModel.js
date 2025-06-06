@@ -6,9 +6,8 @@ const createRolesTable = async () => {
         role_name VARCHAR(20) NOT NULL
       );
     `);
-    console.log("✅ roles table ready");
   } catch (error) {
-    console.error("❌ roles table error:", error);
+    console.error("roles table error:", error);
   }
 };
 

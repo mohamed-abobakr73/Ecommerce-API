@@ -6,9 +6,8 @@ const createBrandsTable = async () => {
         brand_name VARCHAR(50) NOT NULL
       );
     `);
-    console.log("✅ brands table ready");
   } catch (error) {
-    console.error("❌ brands table error:", error);
+    console.error("brands table error:", error);
   }
 };
 

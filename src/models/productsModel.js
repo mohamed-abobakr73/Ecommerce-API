@@ -15,9 +15,8 @@ const createProductsTable = async () => {
         FOREIGN KEY (brand_id) REFERENCES brands(brand_id)
       );
     `);
-    console.log("✅ products table ready");
   } catch (error) {
-    console.error("❌ products table error:", error);
+    console.error("products table error:", error);
   }
 };
 

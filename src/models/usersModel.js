@@ -13,9 +13,9 @@ const createUsersTable = async () => {
         FOREIGN KEY (role_id) REFERENCES roles(role_id)
       );
     `);
-    console.log("✅ users table ready");
+    console.log("users table ready");
   } catch (error) {
-    console.error("❌ users table error:", error);
+    console.error("users table error:", error);
   }
 };
 
