@@ -1,14 +1,9 @@
 import db from "../configs/connectToDb.js";
 import snakeToCamel from "../utils/snakeToCamel.js";
+import { usersServiceQueries } from "../utils/sqlQueries/index.js";
 
 const findAllUsers = async (filters = null) => {
-  const [users] = await db.query(`SELECT 
-  user_id as userId, first_name as firstName, last_name as lastName, email, phone, role_name as role
-FROM
-  users
-      JOIN
-  roles ON users.role_id = roles.role_id;
-`);
+  const [users] = await db.query(usersServiceQueries.findAllUsersQuery);
   return users;
 };
 
