@@ -1,3 +1,5 @@
+import db from "../configs/connectToDb";
+
 const createOrdersTable = async () => {
   try {
     await db.query(`
