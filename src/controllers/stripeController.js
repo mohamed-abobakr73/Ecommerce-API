@@ -125,7 +125,7 @@ const stripeWebHook = asyncWrapper(async (req, res, next) => {
 
       const orderItems = await ordersService.createOrderItems(orderProducts);
       const decrementedProducts =
-        await productsService.decrementProductStockQunatity(sessionProducts);
+        await productsService.decrementProductStockQuantity(sessionProducts);
       break;
     default:
     // console.log(`Unhandled event type ${event.type}`);

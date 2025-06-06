@@ -1,32 +1,19 @@
-import pool from "../configs/connectToDb.js";
-import snakeToCamel from "../utils/snakeToCamel.js";
+import db from "../configs/connectToDb.js";
+import { usersServiceQueries } from "../utils/sqlQueries/index.js";
 
 const findAllUsers = async (filters = null) => {
-  const [users] = await pool.query(`SELECT 
-  user_id as userId, first_name as firstName, last_name as lastName, email, phone, role_name as role
-FROM
-  users
-      JOIN
-  roles ON users.role_id = roles.role_id;
-`);
+  const [users] = await db.query(usersServiceQueries.findAllUsersQuery);
   return users;
 };
 
 const findUser = async (filters, includePassword = false) => {
-  let selectedFields = `
-    user_id as ${snakeToCamel("user_id")},
-    first_name as ${snakeToCamel("first_name")},
-    last_name as ${snakeToCamel("last_name")},
-    email,
-    phone,
-    role_name as role`;
+  let selectedFields = usersServiceQueries.findUserSelectedFields;
 
   if (includePassword) {
     selectedFields += ", password";
   }
 
-  let query = `SELECT ${selectedFields} FROM users JOIN
-  roles ON users.role_id = roles.role_id`;
+  let query = usersServiceQueries.findUserQuery(selectedFields);
 
   let queryParams = [];
 
@@ -40,15 +27,12 @@ const findUser = async (filters, includePassword = false) => {
   }
 
   // Execute query
-  const user = await pool.execute(query, queryParams);
+  const user = await db.execute(query, queryParams);
   return user[0][0];
 };
 
 const addNewUser = async (userData) => {
-  const query = `INSERT INTO users
-    (first_name, last_name, email, password, phone, role_id)
-    values (?, ?, ?, ?, ?, ?)
-  `;
+  const query = usersServiceQueries.createUserQuery;
 
   const queryParams = [
     userData.firstName,
@@ -59,7 +43,7 @@ const addNewUser = async (userData) => {
     userData.role,
   ];
 
-  const [user] = await pool.execute(query, queryParams);
+  const [user] = await db.execute(query, queryParams);
   const userId = user.insertId;
   return userId;
 };

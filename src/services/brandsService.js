@@ -1,37 +1,44 @@
-import pool from "../configs/connectToDb.js";
+import db from "../configs/connectToDb.js";
+import { brandsServiceQueries } from "../utils/sqlQueries/index.js";
 
 const findAllBrands = async () => {
-  const [brands] = await pool.query(`SELECT * FROM brands`);
+  const query = brandsServiceQueries.findBrandsQuery;
+
+  const [brands] = await db.query(query);
+
   return brands;
 };
 
 const findBrand = async (id) => {
-  const query = `SELECT brand_id as brandId, brand_name as brandName FROM brands WHERE brand_id = ?`;
+  const query = brandsServiceQueries.findBrandQuery;
 
-  const brand = await pool.execute(query, [id]);
+  const brand = await db.execute(query, [id]);
+
   return brand[0][0];
 };
 
 const addNewBrand = async (brandName) => {
-  const query = `INSERT INTO brands (brand_name) VALUES (?)`;
+  const query = brandsServiceQueries.createBrandQuery;
 
-  const [result] = await pool.execute(query, [brandName]);
+  const [result] = await db.execute(query, [brandName]);
 
   const brandId = result.insertId;
 
   return brandId;
 };
 
-const updateBrand = async (id, updatedbrand) => {
-  const query = `UPDATE brands SET brand_name = ? WHERE brand_id = ?`;
-  const [result] = await pool.execute(query, [updatedbrand, id]);
+const updateBrand = async (id, brandToUpdate) => {
+  const query = brandsServiceQueries.updateBrandQuery;
+
+  const [result] = await db.execute(query, [brandToUpdate, id]);
+
   return result.affectedRows;
 };
 
 const deleteBrand = async (id) => {
-  const query = `DELETE FROM brands WHERE brand_id = ?`;
+  const query = brandsServiceQueries.deleteBrandQuery;
 
-  const [result] = await pool.execute(query, [id]);
+  const [result] = await db.execute(query, [id]);
   return result.affectedRows;
 };
 

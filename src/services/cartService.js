@@ -1,10 +1,13 @@
-import pool from "../configs/connectToDb.js";
+import db from "../configs/connectToDb.js";
+import { cartServiceQueries } from "../utils/sqlQueries/index.js";
+
+// TODO CHECK the add item to cart query and logic
 
 const findCartId = async (userId) => {
-  const [[{ cart_id: cartId }]] = await pool.query(
-    `SELECT cart_id from cart WHERE user_id  = ?`,
-    [userId]
-  );
+  const query = cartServiceQueries.findCartIdQuery;
+
+  const [[{ cart_id: cartId }]] = await db.execute(query, [userId]);
+
   return cartId;
 };
 
@@ -15,35 +18,17 @@ const findCartItems = async (userId) => {
     return;
   }
 
-  const [cartItems] = await pool.query(
-    `
-  SELECT 
-    cart_items.*, products.*
-  FROM
-    cart_items
-  JOIN
-    products
-  ON
-    cart_items.product_id = products.product_id 
-  WHERE
-    cart_items.cart_id = ?;
-`,
-    [cartId]
-  );
+  const query = cartServiceQueries.findCartItemsQuery;
+
+  const [cartItems] = await db.execute(query, [cartId]);
 
   return { cartId, cartItems };
 };
 
 const createUserCart = async (userId) => {
-  const [result] = await pool.query(
-    `INSERT INTO 
-    cart
-      (user_id)
-    values
-      (?)
-  `,
-    [userId]
-  );
+  const query = cartServiceQueries.createUserCartQuery;
+
+  const [result] = await db.execute(query, [userId]);
 
   return result.affectedRows;
 };
@@ -71,7 +56,7 @@ const addItemToCart = async (data) => {
       newQuantity = currentProductQuantity + quantity;
     }
 
-    const [result] = await pool.execute(query, [newQuantity, productId]);
+    const [result] = await db.execute(query, [newQuantity, productId]);
 
     return { result: result.affectedRows, quantity: newQuantity };
   } else {
@@ -81,7 +66,7 @@ const addItemToCart = async (data) => {
       (?, ?, ?)
     `;
 
-    const [result] = await pool.execute(query, [cartId, productId, quantity]);
+    const [result] = await db.execute(query, [cartId, productId, quantity]);
 
     return { result: result.affectedRows, quantity };
   }
@@ -89,14 +74,21 @@ const addItemToCart = async (data) => {
 
 const updateCartItemQuantity = async (data) => {
   const { cartItemId, quantity } = data;
-  const query = `UPDATE cart_items SET quantity = ? WHERE cart_items_id = ?`;
-  const [result] = await pool.execute(query, [quantity, cartItemId]);
+
+  const query = cartServiceQueries.updateCartItemQuantityQuery;
+
+  const queryParams = [quantity, cartItemId];
+
+  const [result] = await db.execute(query, queryParams);
+
   return result.affectedRows;
 };
 
 const deleteItemFromCart = async (id) => {
-  const query = `DELETE FROM cart_items WHERE cart_items_id = ?`;
-  const [result] = await pool.execute(query, [id]);
+  const query = cartServiceQueries.deleteCartItemQuery;
+
+  const [result] = await db.execute(query, [id]);
+
   return result.affectedRows;
 };
 

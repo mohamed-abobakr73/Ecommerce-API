@@ -1,3 +1,5 @@
+import db from "../configs/connectToDb.js";
+
 const createProductsTable = async () => {
   try {
     await db.query(`

@@ -1,19 +1,19 @@
-import pool from "../configs/connectToDb.js";
+import db from "../configs/connectToDb.js";
 
 const findAllImage = async () => {
-  const [result] = pool.query(`SELECT * FROM images`);
+  const [result] = db.query(`SELECT * FROM images`);
   return result;
 };
 
 const findImage = async (imageId) => {
-  const [query] = await pool.query(`SELECT * FROM images WHERE image_id = ?`, [
+  const [query] = await db.query(`SELECT * FROM images WHERE image_id = ?`, [
     imageId,
   ]);
   return query;
 };
 
 const addImage = async (imagePath) => {
-  const [result] = await pool.query(
+  const [result] = await db.query(
     `INSERT INTO
     images 
       (image_path)

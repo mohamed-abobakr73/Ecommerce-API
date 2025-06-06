@@ -1,3 +1,5 @@
+import db from "../configs/connectToDb.js";
+
 const createOrderItemsTable = async () => {
   try {
     await db.query(`
@@ -10,7 +12,6 @@ const createOrderItemsTable = async () => {
         FOREIGN KEY (product_id) REFERENCES products(product_id)
       );
     `);
-    console.log("order_items table ready");
   } catch (error) {
     console.error("order_items table error:", error);
   }
