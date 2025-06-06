@@ -1,17 +1,19 @@
 import db from "../configs/connectToDb.js";
 import AppError from "../utils/AppError.js";
 import hashValue from "../utils/hashingUtils/hashValue.js";
+import { generateJwt } from "../utils/jwtUtils/index.js";
 import { usersServiceQueries } from "../utils/sqlQueries/index.js";
 
 const generateTokenWithUserData = async (user) => {
-  const { firstName, lastName, email, role } = user.values;
+  const { firstName, lastName, email, role } = user;
+
   const userId = user.insertId;
 
   const tokenPayload = {
     userName: `${firstName} ${lastName}`,
-    email,
+    email: email,
     id: userId,
-    role,
+    role: role,
   };
 
   const token = await generateJwt(tokenPayload);
@@ -69,7 +71,7 @@ const addNewUser = async (userData) => {
 
   const { firstName, lastName, password, email, phone, role } = userData;
 
-  const hashedPassword = hashValue(password);
+  const hashedPassword = await hashValue(password);
 
   const queryParams = [
     firstName,
@@ -77,18 +79,14 @@ const addNewUser = async (userData) => {
     email,
     hashedPassword,
     phone,
-    role || "user",
+    role || 1,
   ];
 
   const [user] = await db.execute(query, queryParams);
 
-  const token = await generateTokenWithUserData(user);
+  const token = await generateTokenWithUserData(userData);
 
-  user.values.id = user.insertId;
-
-  delete user.values.password;
-
-  return { token, user: user.values };
+  return token;
 };
 
 export default { findAllUsers, findUserService, addNewUser };

@@ -25,14 +25,21 @@ const findUser = asyncWrapper(async (req, res, next) => {
 const createUser = asyncWrapper(async (req, res, next) => {
   const validatedData = req.body;
 
-  const { user, token } = await usersService.addNewUser(validatedData);
+  const token = await usersService.addNewUser(validatedData);
 
   // Create user cart.
-  const userCart = await cartService.createUserCart(user.id);
+  // const userCart = await cartService.createUserCart(user.id);
+
+  const createdUser = {
+    firstName: validatedData.firstName,
+    lastName: validatedData.lastName,
+    email: validatedData.email,
+    phone: validatedData.phone,
+  };
 
   return res.status(201).json({
     status: httpStatusText.SUCCESS,
-    data: { user, token: token },
+    data: { user: createdUser, token: token },
   });
 });
 

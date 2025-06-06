@@ -1,3 +1,5 @@
+import httpStatusText from "../utils/httpStatusText.js";
+
 const globalErrorHandler = (error, req, res, next) => {
   res.status(error.statusCode || 500).json({
     status: error.statusText || httpStatusText.ERROR,

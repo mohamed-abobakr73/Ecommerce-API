@@ -7,10 +7,10 @@ const createUsersTable = async () => {
         user_id INT PRIMARY KEY AUTO_INCREMENT,
         first_name VARCHAR(20) NOT NULL,
         last_name VARCHAR(20) NOT NULL,
-        email VARCHAR(50) UNIQUE,
+        email VARCHAR(50) UNIQUE NOT NULL,
+        password VARCHAR(100) NOT NULL,
         phone VARCHAR(20) NOT NULL,
-        joined_at DATE NOT NULL,
-        confirmed BOOLEAN,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         role_id INT NOT NULL,
         FOREIGN KEY (role_id) REFERENCES roles(role_id)
       );
