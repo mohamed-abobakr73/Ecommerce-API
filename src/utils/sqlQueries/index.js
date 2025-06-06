@@ -7,6 +7,7 @@ import categoriesServiceQueries from "./categoriesServiceQueries.js";
 import discountsServiceQueries from "./discountsServiceQueries.js";
 import ordersServiceQueries from "./ordersServiceQueries.js";
 import reviewsServiceQueries from "./reviewsServiceQueries.js";
+import wishlistServiceQueries from "./wishlistServiceQueries.js";
 export {
   usersServiceQueries,
   productsServiceQueries,
@@ -17,4 +18,5 @@ export {
   discountsServiceQueries,
   ordersServiceQueries,
   reviewsServiceQueries,
+  wishlistServiceQueries,
 };
