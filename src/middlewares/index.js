@@ -1,17 +1,17 @@
-import addressesValidation from "./addressesValidation";
-import { asyncWrapper } from "./asyncWrapper";
-import categoriesBrandsValidation from "./categoriesBrandsValidation";
-import discountsValidation from "./discountsValidation";
-import globalErrorHandler from "./globalErrorHandler";
-import imageValidation from "./imageValidation";
-import isAllowed from "./isAllowed";
-import loginValidation from "./loginValidation";
-import registerUserValidation from "./registerUserValidation";
-import verifyToken from "./verifyToken";
-import productValidation from "./productValidation";
-import validateRequestBody from "./validateRequestBody";
-import orderValidation from "./orderValidation";
-import reviewsValidation from "./reviewsValidation";
+import addressesValidation from "./addressesValidation.js";
+import { asyncWrapper } from "./asyncWrapper.js";
+import categoriesBrandsValidation from "./categoriesBrandsValidation.js";
+import discountsValidation from "./discountsValidation.js";
+import globalErrorHandler from "./globalErrorHandler.js";
+import imageValidation from "./imageValidation.js";
+import isAllowed from "./isAllowed.js";
+import loginValidation from "./loginValidation.js";
+import registerUserValidation from "./registerUserValidation.js";
+import verifyToken from "./verifyToken.js";
+import productValidation from "./productValidation.js";
+import validateRequestBody from "./validateRequestBody.js";
+import orderValidation from "./orderValidation.js";
+import reviewsValidation from "./reviewsValidation.js";
 
 export {
   addressesValidation,

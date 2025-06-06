@@ -1,8 +1,8 @@
 import { validationResult } from "express-validator";
 import bcrypt from "bcrypt";
-import { asyncWrapper } from "../middlewares/asyncWrapper.js";
+import { asyncWrapper } from "../middlewares/index.js";
 import AppError from "../utils/AppError.js";
-import generateJwt from "../utils/generateJwt.js";
+import { generateJwt } from "../utils/jwtUtils/index.js";
 import usersService from "../services/usersService.js";
 import httpStatusText from "../utils/httpStatusText.js";
 import cartService from "../services/cartService.js";
@@ -25,24 +25,6 @@ const findUser = asyncWrapper(async (req, res, next) => {
 const createUser = asyncWrapper(async (req, res, next) => {
   const { firstName, lastName, email, password, confirmPassword, phone, role } =
     req.body;
-
-  // Validating the request body.
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    const error = new AppError(errors.array(), 400, httpStatusText.FAIL);
-    return next(error);
-  }
-
-  // Checking if the use aleardy registered.
-  const userExists = await usersService.findUser({ email });
-  if (userExists) {
-    const error = new AppError(
-      "This user is already registerd",
-      400,
-      httpStatusText.FAIL
-    );
-    return next(error);
-  }
 
   // Checking if the the password and confirm password is matched.
   if (!(password === confirmPassword)) {
@@ -70,13 +52,14 @@ const createUser = asyncWrapper(async (req, res, next) => {
   const newUserId = await usersService.addNewUser(newUser);
 
   // Generating JWT token.
-  const token = await generateJwt({
-    userName: newUser.firstName,
-    userName: newUser.lastName,
+  const tokenPayload = {
+    userName: `${newUser.firstName} ${newUser.lastName}`,
     email: newUser.email,
     id: newUserId,
     role: newUser.role,
-  });
+  };
+
+  const token = await generateJwt(tokenPayload);
 
   const { password: excludedPassword, ...newUserData } = newUser;
 
