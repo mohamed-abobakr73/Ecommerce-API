@@ -43,6 +43,8 @@ const initializeDatabase = async () => {
     await createReviewsTable();
 
     await createAddressesTable();
+
+    console.log("Database initialized successfully");
   } catch (error) {
     console.log("Database initialization error:", error);
   }

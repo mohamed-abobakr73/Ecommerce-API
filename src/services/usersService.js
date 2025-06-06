@@ -1,5 +1,4 @@
 import db from "../configs/connectToDb.js";
-import snakeToCamel from "../utils/snakeToCamel.js";
 import { usersServiceQueries } from "../utils/sqlQueries/index.js";
 
 const findAllUsers = async (filters = null) => {
@@ -8,20 +7,13 @@ const findAllUsers = async (filters = null) => {
 };
 
 const findUser = async (filters, includePassword = false) => {
-  let selectedFields = `
-    user_id as ${snakeToCamel("user_id")},
-    first_name as ${snakeToCamel("first_name")},
-    last_name as ${snakeToCamel("last_name")},
-    email,
-    phone,
-    role_name as role`;
+  let selectedFields = usersServiceQueries.findUserSelectedFields;
 
   if (includePassword) {
     selectedFields += ", password";
   }
 
-  let query = `SELECT ${selectedFields} FROM users JOIN
-  roles ON users.role_id = roles.role_id`;
+  let query = usersServiceQueries.findUserQuery(selectedFields);
 
   let queryParams = [];
 
@@ -40,10 +32,7 @@ const findUser = async (filters, includePassword = false) => {
 };
 
 const addNewUser = async (userData) => {
-  const query = `INSERT INTO users
-    (first_name, last_name, email, password, phone, role_id)
-    values (?, ?, ?, ?, ?, ?)
-  `;
+  const query = usersServiceQueries.createUserQuery;
 
   const queryParams = [
     userData.firstName,
