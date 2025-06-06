@@ -1,40 +1,25 @@
 import db from "../configs/connectToDb.js";
+import { reviewsServiceQueries } from "../utils/sqlQueries/index.js";
 
 const findAllReviews = async (productId) => {
-  const query = `
-  SELECT 
-    review_id AS reviewId,
-    user_id AS userId,
-    product_id AS productId,
-    rating,
-    review_text AS reviewText,
-    created_at AS createdAt
-  FROM
-      reviews
-  WHERE
-    product_id = 1;
+  const query = reviewsServiceQueries.findAllReviewsQuery;
 
-  `;
+  const queryParams = [productId];
 
-  const [result] = await db.query(query, [productId]);
+  const [result] = await db.execute(query, queryParams);
+
   return result;
 };
 
 const addReview = async (data) => {
-  const { userId, productId, rating, reveiwText } = data;
-  const query = `
-  INSERT INTO
-    reviews 
-      (user_id, product_id, rating, review_text) 
-    VALUES 
-      (?, ?, ?, ?);
-`;
-  const [result] = await db.query(query, [
-    userId,
-    productId,
-    rating,
-    reveiwText,
-  ]);
+  const { userId, productId, rating, reviewText } = data;
+
+  const query = reviewsServiceQueries.createReviewQuery;
+
+  const queryParams = [userId, productId, rating, reviewText];
+
+  const [result] = await db.execute(query, queryParams);
+
   return result.affectedRows;
 };
 
