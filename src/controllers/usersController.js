@@ -25,7 +25,7 @@ const findUser = asyncWrapper(async (req, res, next) => {
 const createUser = asyncWrapper(async (req, res, next) => {
   const validatedData = req.body;
 
-  const token = await usersService.addNewUser(validatedData);
+  const token = await usersService.registerUserService(validatedData);
 
   // Create user cart.
   // const userCart = await cartService.createUserCart(user.id);

@@ -66,7 +66,7 @@ const findUserService = async (filters, includePassword = false) => {
   }
 };
 
-const addNewUser = async (userData) => {
+const registerUserService = async (userData) => {
   const query = usersServiceQueries.createUserQuery;
 
   const { firstName, lastName, password, email, phone, role } = userData;
@@ -89,4 +89,4 @@ const addNewUser = async (userData) => {
   return token;
 };
 
-export default { findAllUsers, findUserService, addNewUser };
+export default { findAllUsers, findUserService, registerUserService };
