@@ -1,3 +1,4 @@
+import { getProduct } from "../../controllers/productsController.js";
 import snakeToCamel from "../snakeToCamel.js";
 import usersServiceQueries from "./usersServiceQueries.js";
 
@@ -37,11 +38,19 @@ const findProductQuery = `
   ${productWhereClauseQuery}
 `;
 
+const findProductsByIdsQuery = (productIds) => {
+  return `
+    ${findProductsQuery}
+    WHERE product_id IN (${productIds})
+    ORDER BY product_id ASC
+  `;
+};
+
 const createProductQuery = `
   INSERT INTO products
     (product_name, product_description, price, stock_quantity, seller_id, category_id, brand_id, product_image)
   VALUES 
-      (?, ?, ?, ?, ?, ?, ?, ?)
+      (?, ?, ?, ?, ?, ?, ?, ?);
   `;
 
 const updateProductQuery = (fieldsToUpdate) => {
@@ -60,6 +69,7 @@ const deleteProductQuery = `
 export default {
   findProductsQuery,
   findProductQuery,
+  findProductsByIdsQuery,
   createProductQuery,
   updateProductQuery,
   deleteProductQuery,

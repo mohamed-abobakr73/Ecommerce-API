@@ -14,14 +14,13 @@ const findAllProductsService = async () => {
   return products;
 };
 
-const findProductsByIds = async (ids) => {
-  const [result] = await db.query(
-    getProductsQuery +
-      ` WHERE product_id IN (${ids
-        .map(() => "?")
-        .join(", ")}) ORDER BY product_id ASC`,
-    ids
-  );
+const findProductsByIds = async (productIds) => {
+  const productIdsQuery = ids.map(() => "?").join(", ");
+
+  const query = productsServiceQueries.findProductsByIdsQuery(productIdsQuery);
+
+  const [result] = await db.execute(query, productIds);
+
   return result;
 };
 
