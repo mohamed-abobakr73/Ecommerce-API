@@ -44,6 +44,14 @@ const createProductQuery = `
       (?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
+const updateProductQuery = (fieldsToUpdate) => {
+  return `
+      UPDATE products
+      SET ${fieldsToUpdate}
+      ${productWhereClauseQuery}
+    `;
+};
+
 const deleteProductQuery = `
   DELETE FROM products
   ${productWhereClauseQuery}
@@ -53,5 +61,6 @@ export default {
   findProductsQuery,
   findProductQuery,
   createProductQuery,
+  updateProductQuery,
   deleteProductQuery,
 };

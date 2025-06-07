@@ -21,15 +21,17 @@ const productsRouter = Router();
 productsRouter.route("/").get(getAllProducts);
 productsRouter.route("/:productId").get(getProduct);
 
-productsRouter.route("/").post(
-  verifyToken,
-  // isAllowed(usersRoles.SELLER, usersRoles.ADMIN),
-  upload.single("image"),
-  productValidation(),
-  validateRequestBody,
-  imageValidation,
-  createProduct
-);
+productsRouter
+  .route("/")
+  .post(
+    verifyToken,
+    isAllowed(usersRoles.SELLER, usersRoles.ADMIN),
+    upload.single("image"),
+    productValidation(),
+    validateRequestBody,
+    imageValidation,
+    createProduct
+  );
 
 productsRouter
   .route("/:productId")

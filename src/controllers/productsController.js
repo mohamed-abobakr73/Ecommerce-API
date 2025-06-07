@@ -39,8 +39,9 @@ const createProduct = asyncWrapper(async (req, res, next) => {
 
 const updateProduct = asyncWrapper(async (req, res, next) => {
   const { productId } = req.params;
+  const validatedData = req.body;
 
-  if (!Object.keys(req.body).length) {
+  if (!Object.keys(validatedData).length) {
     const error = new AppError(
       "No fields to update provided",
       400,
@@ -51,17 +52,13 @@ const updateProduct = asyncWrapper(async (req, res, next) => {
 
   if (req.file) {
     const newProductImage = await imagesService.addImage(req.file.path);
-    req.body.productImage = newProductImage;
+    validatedData.productImage = newProductImage;
   }
 
-  const isUpdated = await productsService.updateProduct(productId, req.body);
-
-  if (!isUpdated) {
-    const error = new AppError("Invalid product id", 400, httpStatusText.FAIL);
-    return next(error);
-  }
-
-  const updatedProduct = await productsService.findProduct(productId);
+  const updatedProduct = await productsService.updateProduct(
+    productId,
+    validatedData
+  );
 
   return res
     .status(200)

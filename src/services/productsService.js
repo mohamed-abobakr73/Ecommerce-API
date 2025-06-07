@@ -58,21 +58,23 @@ const createProductService = async (productData) => {
   return product;
 };
 
-const updateProduct = async (id, data) => {
+const updateProduct = async (productId, data) => {
   const fieldsToUpdate = Object.keys(data)
     .map((field) => `${camelToSnake(field)} = ?, `)
-    .join("");
+    .join("")
+    .slice(0, -2);
+
+  const query = productsServiceQueries.updateProductQuery(fieldsToUpdate);
 
   const fieldsValues = Object.values(data);
 
-  const query = `UPDATE products SET ${fieldsToUpdate.slice(
-    0,
-    fieldsToUpdate.length - 2
-  )}
-    WHERE product_id = ?
-  `;
-  const [result] = await db.execute(query, [...fieldsValues, id]);
-  return result.affectedRows;
+  const queryParams = [...fieldsValues, productId];
+
+  await db.execute(query, queryParams);
+
+  const updatedProduct = await findProductService(productId);
+
+  return updatedProduct;
 };
 
 const deleteProduct = async (id) => {
