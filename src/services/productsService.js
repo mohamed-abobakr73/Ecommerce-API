@@ -1,6 +1,7 @@
 import db from "../configs/connectToDb.js";
 import { productsServiceQueries } from "../utils/sqlQueries/index.js";
 import camelToSnake from "../utils/camelToSnake.js";
+import checkIfResourceExists from "../utils/checkIfResourceExists.js";
 
 // TODO ADD the update product, the find products by ids, and the decrement products quantity
 
@@ -24,13 +25,16 @@ const findProductsByIds = async (ids) => {
   return result;
 };
 
-const findProduct = async (id) => {
-  const query =
-    productsServiceQueries.findProductsQuery + " WHERE product_id = ?;";
+const findProduct = async (productId) => {
+  const query = productsServiceQueries.findProductQuery;
 
-  const [[productData]] = await db.execute(query, [id]);
+  const queryParams = [productId];
 
-  return productData;
+  const [[product]] = await db.execute(query, queryParams);
+
+  checkIfResourceExists(product, "Product not found");
+
+  return product;
 };
 
 const addNewProduct = async (product) => {

@@ -1,17 +1,23 @@
 import snakeToCamel from "../snakeToCamel.js";
+import findUserFields from "./usersServiceQueries.js";
+
+const productWhereClauseQuery = `
+  WHERE product_id = ?
+`;
 
 const findProductsQuery = `
 SELECT 
-  product_id as ${snakeToCamel("product_id")},
-  product_name as ${snakeToCamel("product_name")},
-  product_description as ${snakeToCamel("product_description")},
+  product_id AS ${snakeToCamel("product_id")},
+  product_name AS ${snakeToCamel("product_name")},
+  product_description AS ${snakeToCamel("product_description")},
   price,
-  stock_quantity as ${snakeToCamel("stock_quantity")},
-  category_name as ${snakeToCamel("category_name")},
-  brand_name as ${snakeToCamel("brand_name")},
-  image_path as ${snakeToCamel("image_path")},
-  products.created_at as ${snakeToCamel("created_at")},
-  seller_id as ${snakeToCamel("seller_id")}
+  stock_quantity AS ${snakeToCamel("stock_quantity")},
+  category_name AS ${snakeToCamel("category_name")},
+  brand_name AS ${snakeToCamel("brand_name")},
+  image_path AS ${snakeToCamel("image_path")},
+  products.created_at AS ${snakeToCamel("created_at")},
+  seller_id AS ${snakeToCamel("seller_id")},
+  ${findUserFields}
 FROM
   products
       JOIN
@@ -19,7 +25,15 @@ FROM
       JOIN
   brands ON products.brand_id = brands.brand_id
       JOIN
-  images ON products.product_image = images.image_id`;
+  images ON products.product_image = images.image_id
+      JOIN
+  users ON products.seller_id = users.user_id
+  `;
+
+const findProductQuery = `
+  ${findProductsQuery}
+  ${productWhereClauseQuery}
+`;
 
 const createProductQuery = `
   INSERT INTO products
@@ -30,7 +44,12 @@ const createProductQuery = `
 
 const deleteProductQuery = `
   DELETE FROM products
-  WHERE product_id = ?
+  ${productWhereClauseQuery}
 `;
 
-export default { findProductsQuery, createProductQuery, deleteProductQuery };
+export default {
+  findProductsQuery,
+  findProductQuery,
+  createProductQuery,
+  deleteProductQuery,
+};

@@ -18,18 +18,12 @@ const getAllProducts = asyncWrapper(async (req, res, next) => {
 
 const getProduct = asyncWrapper(async (req, res, next) => {
   const { productId } = req.params;
-  const productData = await productsService.findProduct(productId);
+  const product = await productsService.findProduct(productId);
 
-  if (!productData) {
-    const error = new AppError("Product not found", 400, httpStatusText.FAIL);
-    return next(error);
-  }
-  const { sellerId } = productData;
-  const productSeller = await usersService.findUser({
-    user_id: +sellerId,
-  });
-
-  const product = { ...productData, seller: productSeller };
+  // const { sellerId } = productData;
+  // const productSeller = await usersService.findUser({
+  //   user_id: +sellerId,
+  // });
 
   return res
     .status(200)
