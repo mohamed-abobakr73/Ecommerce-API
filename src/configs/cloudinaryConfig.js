@@ -11,15 +11,16 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary.v2,
   params: {
-    folder: "ecommerce-backend",
+    folder: "ecommerce-API",
     format: async (req, file) => {
-      return ["jpeg", "jpg", "png", "gif", "webp"].includes(
-        file.mimetype.split("/")[1]
-      )
-        ? file.mimetype.split("/")[1]
+      const fileFormat = file.mimetype.split("/")[1];
+      return ["jpeg", "jpg", "png", "gif", "webp"].includes(fileFormat)
+        ? fileFormat
         : "jpg";
     },
-    public_id: (req, file) => file.originalname.split(".")[0],
+    public_id: (req, file) => {
+      return file.originalname.split(".")[0];
+    },
   },
 });
 

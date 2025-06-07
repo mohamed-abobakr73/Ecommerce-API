@@ -25,7 +25,7 @@ const findProductsByIds = async (ids) => {
   return result;
 };
 
-const findProduct = async (productId) => {
+const findProductService = async (productId) => {
   const query = productsServiceQueries.findProductQuery;
 
   const queryParams = [productId];
@@ -37,9 +37,7 @@ const findProduct = async (productId) => {
   return product;
 };
 
-const addNewProduct = async (product) => {
-  const { productData, productImage } = product;
-
+const createProductService = async (productData) => {
   const query = productsServiceQueries.createProductQuery;
 
   const queryParams = [
@@ -50,12 +48,14 @@ const addNewProduct = async (product) => {
     productData.sellerId,
     productData.category,
     productData.brand,
-    productImage,
+    productData.productImage,
   ];
 
   const [result] = await db.execute(query, queryParams);
 
-  return result.insertId;
+  const product = await findProductService(result.insertId);
+
+  return product;
 };
 
 const updateProduct = async (id, data) => {
@@ -104,8 +104,8 @@ const decrementProductStockQuantity = async (products) => {
 export default {
   findAllProductsService,
   findProductsByIds,
-  findProduct,
-  addNewProduct,
+  findProductService,
+  createProductService,
   updateProduct,
   deleteProduct,
   decrementProductStockQuantity,

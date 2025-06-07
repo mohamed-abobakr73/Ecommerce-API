@@ -31,6 +31,9 @@ const productValidation = (isPatch) => {
       .notEmpty()
       .withMessage("Product category is required"),
     requiredCheck("brand").notEmpty().withMessage("Product brand is required"),
+    requiredCheck("sellerId")
+      .notEmpty()
+      .withMessage("Product seller id is required"),
   ];
 };
 

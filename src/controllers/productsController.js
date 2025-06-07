@@ -1,11 +1,7 @@
-import { validationResult } from "express-validator";
 import { asyncWrapper } from "../middlewares/asyncWrapper.js";
 import AppError from "../utils/AppError.js";
 import httpStatusText from "../utils/httpStatusText.js";
 import productsService from "../services/productsService.js";
-import usersService from "../services/usersService.js";
-import categoriesService from "../services/categoriesService.js";
-import brandsService from "../services/brandsService.js";
 import imagesService from "../services/imagesService.js";
 
 const getAllProducts = asyncWrapper(async (req, res, next) => {
@@ -18,12 +14,7 @@ const getAllProducts = asyncWrapper(async (req, res, next) => {
 
 const getProduct = asyncWrapper(async (req, res, next) => {
   const { productId } = req.params;
-  const product = await productsService.findProduct(productId);
-
-  // const { sellerId } = productData;
-  // const productSeller = await usersService.findUser({
-  //   user_id: +sellerId,
-  // });
+  const product = await productsService.findProductService(productId);
 
   return res
     .status(200)
@@ -31,61 +22,18 @@ const getProduct = asyncWrapper(async (req, res, next) => {
 });
 
 const createProduct = asyncWrapper(async (req, res, next) => {
-  const {
-    productName,
-    productDescription,
-    price,
-    stockQuantity,
-    sellerId,
-    category,
-    brand,
-  } = req.body;
-
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    const error = new AppError(errors.array(), 400, httpStatusText.FAIL);
-    return next(error);
-  }
+  const validatedData = req.body;
 
   const uploadedImage = req.file.path;
-
   const productImage = await imagesService.addImage(uploadedImage);
 
-  const newProductId = await productsService.addNewProduct({
-    productData: req.body,
-    productImage,
-  });
+  validatedData.productImage = productImage;
 
-  if (!newProductId) {
-    const error = new AppError(
-      "Failed to create product, please try again",
-      400,
-      httpStatusText.FAIL
-    );
-    return next(error);
-  }
-
-  const productSeller = await usersService.findUser({ user_id: sellerId });
-
-  const productCategory = await categoriesService.findCategory(+category);
-
-  const productBrand = await brandsService.findBrand(+brand);
-
-  const newProductData = {
-    id: newProductId,
-    productName,
-    productDescription,
-    price,
-    stockQuantity,
-    category: productCategory,
-    brand: productBrand,
-    productImage: uploadedImage,
-    createdBy: { ...productSeller },
-  };
+  const product = await productsService.createProductService(validatedData);
 
   return res.status(201).json({
     status: httpStatusText.SUCCESS,
-    data: { newProduct: newProductData },
+    data: { product },
   });
 });
 
