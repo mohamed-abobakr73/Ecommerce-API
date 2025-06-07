@@ -9,7 +9,8 @@ import brandsService from "../services/brandsService.js";
 import imagesService from "../services/imagesService.js";
 
 const getAllProducts = asyncWrapper(async (req, res, next) => {
-  const products = await productsService.findAllProducts();
+  const products = await productsService.findAllProductsService();
+
   return res
     .status(200)
     .json({ status: httpStatusText.SUCCESS, data: { products } });

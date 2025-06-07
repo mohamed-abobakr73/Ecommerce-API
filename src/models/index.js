@@ -12,6 +12,7 @@ import createCartItemsTable from "./cartItemsModel.js";
 import createWishListsTable from "./wishlistsModel.js";
 import createPaymentsTable from "./paymentsModel.js";
 import createAddressesTable from "./addressesModel.js";
+import createImagesTable from "./imagesModel.js";
 
 export {
   createUsersTable,
@@ -28,4 +29,5 @@ export {
   createWishListsTable,
   createPaymentsTable,
   createAddressesTable,
+  createImagesTable,
 };

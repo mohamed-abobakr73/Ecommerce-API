@@ -13,18 +13,19 @@ import {
   createWishListsTable,
   createPaymentsTable,
   createAddressesTable,
+  createImagesTable,
 } from "../models/index.js";
 import { seedRoles } from "../utils/sqlQueries/index.js";
 import db from "./connectToDb.js";
 
 const initializeDatabase = async () => {
-  // Create the database if it doesn't exist
   try {
     await db.query(`CREATE DATABASE IF NOT EXISTS ecommerce_db`);
     await db.query(`USE ecommerce_db`);
 
     await createRolesTable();
     await createUsersTable();
+    await createImagesTable();
 
     await createCategoriesTable();
     await createBrandsTable();

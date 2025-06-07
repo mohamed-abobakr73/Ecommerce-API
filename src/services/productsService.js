@@ -4,11 +4,12 @@ import camelToSnake from "../utils/camelToSnake.js";
 
 // TODO ADD the update product, the find products by ids, and the decrement products quantity
 
-const findAllProducts = async () => {
+const findAllProductsService = async () => {
   const query =
     productsServiceQueries.findProductsQuery + " ORDER BY product_id ASC;";
 
   const [products] = await db.query(query);
+
   return products;
 };
 
@@ -97,7 +98,7 @@ const decrementProductStockQuantity = async (products) => {
 };
 
 export default {
-  findAllProducts,
+  findAllProductsService,
   findProductsByIds,
   findProduct,
   addNewProduct,
