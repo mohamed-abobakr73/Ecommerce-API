@@ -12,9 +12,12 @@ const createProductsTable = async () => {
         seller_id INT NOT NULL,
         category_id INT NOT NULL,
         brand_id INT NOT NULL,
-        created_at DATE NOT NULL,
+        product_image INT NOT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (seller_id) REFERENCES users(user_id),
         FOREIGN KEY (category_id) REFERENCES categories(category_id),
-        FOREIGN KEY (brand_id) REFERENCES brands(brand_id)
+        FOREIGN KEY (brand_id) REFERENCES brands(brand_id),
+        FOREIGN KEY (product_image) REFERENCES images(image_id)
       );
     `);
   } catch (error) {

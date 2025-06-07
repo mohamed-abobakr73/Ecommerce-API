@@ -5,12 +5,15 @@ import {
   createProduct,
   updateProduct,
   deleteProduct,
-} from "../controllers/producutsController.js";
-import productValidation from "../middlewares/productValidation.js";
+} from "../controllers/productsController.js";
+import {
+  productValidation,
+  imageValidation,
+  verifyToken,
+  isAllowed,
+  validateRequestBody,
+} from "../middlewares/index.js";
 import upload from "../configs/cloudinaryConfig.js";
-import imageValidation from "../middlewares/imageValidation.js";
-import verifyToken from "../middlewares/verifyToken.js";
-import isAllowed from "../middlewares/isAllowed.js";
 import usersRoles from "../utils/usersRoles.js";
 
 const productsRouter = Router();
@@ -25,6 +28,7 @@ productsRouter
     isAllowed(usersRoles.SELLER, usersRoles.ADMIN),
     upload.single("image"),
     productValidation(),
+    validateRequestBody,
     imageValidation,
     createProduct
   );

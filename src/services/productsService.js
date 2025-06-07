@@ -1,40 +1,40 @@
 import db from "../configs/connectToDb.js";
 import { productsServiceQueries } from "../utils/sqlQueries/index.js";
 import camelToSnake from "../utils/camelToSnake.js";
+import checkIfResourceExists from "../utils/checkIfResourceExists.js";
 
-// TODO ADD the update product, the find products by ids, and the decrement products quantity
-
-const findAllProducts = async () => {
+const findAllProductsService = async () => {
   const query =
     productsServiceQueries.findProductsQuery + " ORDER BY product_id ASC;";
 
   const [products] = await db.query(query);
+
   return products;
 };
 
-const findProductsByIds = async (ids) => {
-  const [result] = await db.query(
-    getProductsQuery +
-      ` WHERE product_id IN (${ids
-        .map(() => "?")
-        .join(", ")}) ORDER BY product_id ASC`,
-    ids
-  );
+const findProductsByIds = async (productIds) => {
+  const productIdsQuery = ids.map(() => "?").join(", ");
+
+  const query = productsServiceQueries.findProductsByIdsQuery(productIdsQuery);
+
+  const [result] = await db.execute(query, productIds);
+
   return result;
 };
 
-const findProduct = async (id) => {
-  const query =
-    productsServiceQueries.findProductsQuery + " WHERE product_id = ?;";
+const findProductService = async (productId) => {
+  const query = productsServiceQueries.findProductQuery;
 
-  const [[productData]] = await db.execute(query, [id]);
+  const queryParams = [productId];
 
-  return productData;
+  const [[product]] = await db.execute(query, queryParams);
+
+  checkIfResourceExists(product, "Product not found");
+
+  return product;
 };
 
-const addNewProduct = async (product) => {
-  const { productData, productImage } = product;
-
+const createProductService = async (productData) => {
   const query = productsServiceQueries.createProductQuery;
 
   const queryParams = [
@@ -45,63 +45,64 @@ const addNewProduct = async (product) => {
     productData.sellerId,
     productData.category,
     productData.brand,
-    productImage,
+    productData.productImage,
   ];
 
   const [result] = await db.execute(query, queryParams);
 
-  return result.insertId;
+  const product = await findProductService(result.insertId);
+
+  return product;
 };
 
-const updateProduct = async (id, data) => {
+const updateProductService = async (productId, data) => {
   const fieldsToUpdate = Object.keys(data)
     .map((field) => `${camelToSnake(field)} = ?, `)
-    .join("");
+    .join("")
+    .slice(0, -2);
+
+  const query = productsServiceQueries.updateProductQuery(fieldsToUpdate);
 
   const fieldsValues = Object.values(data);
 
-  const query = `UPDATE products SET ${fieldsToUpdate.slice(
-    0,
-    fieldsToUpdate.length - 2
-  )}
-    WHERE product_id = ?
-  `;
-  const [result] = await db.execute(query, [...fieldsValues, id]);
-  return result.affectedRows;
+  const queryParams = [...fieldsValues, productId];
+
+  await db.execute(query, queryParams);
+
+  const updatedProduct = await findProductService(productId);
+
+  return updatedProduct;
 };
 
-const deleteProduct = async (id) => {
+const deleteProductService = async (id) => {
   const query = productsServiceQueries.deleteProductQuery;
 
   const [result] = await db.execute(query, [id]);
+
+  checkIfResourceExists(result.affectedRows, "Product not found");
 
   return result.affectedRows;
 };
 
 const decrementProductStockQuantity = async (products) => {
-  const query = `
-  UPDATE products
-  SET stock_quantity = CASE
-  ${products
-    .map((_, i) => `WHEN product_id = ? THEN stock_quantity - ?`)
-    .join(" ")}
-  END
-  WHERE product_id IN (${products.map(() => "?").join(", ")});`;
+  const query =
+    productsServiceQueries.decrementProductStockQuantityQuery(products);
 
-  const values = products
+  const queryParams = products
     .flatMap((product) => [product.id, product.quantity])
     .concat(products.map((product) => product.id));
 
-  const [result] = await db.execute(query, values);
+  const [result] = await db.execute(query, queryParams);
+
   return result.affectedRows;
 };
 
 export default {
-  findAllProducts,
+  findAllProductsService,
   findProductsByIds,
-  findProduct,
-  addNewProduct,
-  updateProduct,
-  deleteProduct,
+  findProductService,
+  createProductService,
+  updateProductService,
+  deleteProductService,
   decrementProductStockQuantity,
 };
