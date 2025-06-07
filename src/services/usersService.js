@@ -1,8 +1,15 @@
 import db from "../configs/connectToDb.js";
 import AppError from "../utils/AppError.js";
-import hashValue from "../utils/hashingUtils/hashValue.js";
+import { hashValue, compareHashedValues } from "../utils/hashingUtils/index.js";
 import { generateJwt } from "../utils/jwtUtils/index.js";
 import { usersServiceQueries } from "../utils/sqlQueries/index.js";
+
+const checkIfUserExists = (user) => {
+  if (!user) {
+    const error = new AppError("User is not found.", 400, httpStatusText.FAIL);
+    throw error;
+  }
+};
 
 const generateTokenWithUserData = async (user) => {
   const { firstName, lastName, email, role } = user;
@@ -29,28 +36,22 @@ const createWhereConditions = (filters) => {
   const conditions = Object.keys(filters)
     .map((key) => `${key} = ?`)
     .join(" AND ");
-  const queryParams = Object.values(filters);
-  return { whereClause: ` WHERE ${conditions}`, queryParams };
+  const queryValues = Object.values(filters);
+  return { whereClause: ` WHERE ${conditions}`, queryValues };
 };
 
-const findUserService = async (filters, includePassword = false) => {
+const findUserService = async (filters) => {
   try {
-    let selectedFields = usersServiceQueries.findUserSelectedFields;
-
-    if (includePassword) {
-      selectedFields += ", password";
-    }
-
-    let query = usersServiceQueries.findUserQuery(selectedFields);
+    let query = usersServiceQueries.findUserQuery;
 
     let queryParams = [];
 
     const filterKeys = Object.keys(filters);
 
     if (filterKeys.length > 0) {
-      const { whereClause, queryParams } = createWhereConditions(filters);
+      const { whereClause, queryValues } = createWhereConditions(filters);
       query += whereClause;
-      queryParams = queryParams;
+      queryParams = queryValues;
     }
 
     const user = await db.execute(query, queryParams);
@@ -89,4 +90,26 @@ const registerUserService = async (userData) => {
   return token;
 };
 
-export default { findAllUsers, findUserService, registerUserService };
+const loginService = async (email, password) => {
+  const user = await findUserService({ email });
+
+  checkIfUserExists(user);
+
+  await compareHashedValues(
+    password,
+    user.password,
+    "Invalid credentials, please try again."
+  );
+
+  const token = await generateTokenWithUserData(user);
+
+  delete user.password;
+  return { user, token };
+};
+
+export default {
+  findAllUsers,
+  findUserService,
+  registerUserService,
+  loginService,
+};

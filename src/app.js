@@ -15,16 +15,15 @@ import {
   reviewsRouter,
   addressesRouter,
 } from "./routes/index.js";
-
+import morgan from "morgan";
 import globalErrorHandler from "./middlewares/globalErrorHandler.js";
 
 const app = express();
 
-dotenv.config(); // To read from env files.
-
-app.use(cors()); // To enable cors for all website and this should be modified on production.
-
-app.use(express.json()); // Parsing request body to json format.
+dotenv.config();
+app.use(cors());
+app.use(express.json());
+app.use(morgan("dev"));
 
 // Initialize database
 initializeDatabase();

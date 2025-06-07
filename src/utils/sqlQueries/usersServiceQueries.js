@@ -1,42 +1,43 @@
 import snakeToCamel from "../snakeToCamel.js";
 
+const findUserFields = `
+    user_id AS ${snakeToCamel("user_id")},
+    first_name AS ${snakeToCamel("first_name")},
+    last_name AS ${snakeToCamel("last_name")},
+    email,
+    phone,
+    role_name AS ${snakeToCamel("role")}
+`;
+
+const selectFromUsersJoinRolesQuery = `
+  FROM 
+    users 
+  JOIN
+    roles ON users.role_id = roles.role_id
+`;
+
 const findAllUsersQuery = `
   SELECT 
-    user_id as ${snakeToCamel("user_id")},
-    first_name as ${snakeToCamel("first_name")},
-    last_name as ${snakeToCamel("last_name")},
-    email,
-    phone,
-    role_name as ${snakeToCamel("role")}
-  FROM
-    users
-        JOIN
-    roles ON users.role_id = roles.role_id;
+    ${findUserFields}
+    ${selectFromUsersJoinRolesQuery}
 `;
 
-const findUserSelectedFields = `
-    user_id as ${snakeToCamel("user_id")},
-    first_name as ${snakeToCamel("first_name")},
-    last_name as ${snakeToCamel("last_name")},
-    email,
-    phone,
-    role_name as ${snakeToCamel("role")}
-`;
-
-const findUserQuery = (selectedFields) => {
-  return `SELECT ${selectedFields} FROM users JOIN
-  roles ON users.role_id = roles.role_id`;
-};
+const findUserQuery = `
+    SELECT 
+      ${findUserFields + ", password"}
+      ${selectFromUsersJoinRolesQuery}
+      `;
 
 const createUserQuery = `
   INSERT INTO users
     (first_name, last_name, email, password, phone, role_id)
-    values (?, ?, ?, ?, ?, ?)
+  VALUES
+      (?, ?, ?, ?, ?, ?)
   `;
 
 export default {
   findAllUsersQuery,
-  findUserSelectedFields,
+  findUserFields,
   createUserQuery,
   findUserQuery,
 };

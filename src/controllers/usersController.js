@@ -45,42 +45,12 @@ const createUser = asyncWrapper(async (req, res, next) => {
 
 const login = asyncWrapper(async (req, res, next) => {
   const { email, password } = req.body;
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    const error = new AppError(errors.array(), 400, httpStatusText.FAIL);
-    return next(error);
-  }
 
-  const user = await usersService.findUser({ email }, true);
-
-  if (!user) {
-    const error = new AppError("User is not found.", 400, httpStatusText.FAIL);
-    return next(error);
-  }
-
-  const matchedPassword = await bcrypt.compareSync(password, user.password);
-
-  if (!matchedPassword) {
-    const error = new AppError(
-      "Wrong password, please try again.",
-      400,
-      httpStatusText.FAIL
-    );
-    return next(error);
-  }
-
-  const userData = {
-    userName: `${user.firstName} ${user.lastName}`,
-    email: user.email,
-    id: user.user_id,
-    role: user.role,
-  };
-
-  const token = await generateJwt(userData);
+  const { user, token } = await usersService.loginService(email, password);
 
   return res
     .status(200)
-    .json({ status: httpStatusText.SUCCESS, data: { user: userData, token } });
+    .json({ status: httpStatusText.SUCCESS, data: { user, token } });
 });
 
 export { getAllUsers, findUser, createUser, login };
