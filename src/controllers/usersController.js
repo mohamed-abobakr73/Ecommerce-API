@@ -1,11 +1,6 @@
-import { validationResult } from "express-validator";
-import bcrypt from "bcrypt";
 import { asyncWrapper } from "../middlewares/index.js";
-import AppError from "../utils/AppError.js";
-import { generateJwt } from "../utils/jwtUtils/index.js";
 import usersService from "../services/usersService.js";
 import httpStatusText from "../utils/httpStatusText.js";
-import cartService from "../services/cartService.js";
 
 const getAllUsers = asyncWrapper(async (req, res, next) => {
   const users = await usersService.findAllUsers();

@@ -1,6 +1,7 @@
 import db from "../configs/connectToDb.js";
 import AppError from "../utils/AppError.js";
 import { hashValue, compareHashedValues } from "../utils/hashingUtils/index.js";
+import httpStatusText from "../utils/httpStatusText.js";
 import { generateJwt } from "../utils/jwtUtils/index.js";
 import { usersServiceQueries } from "../utils/sqlQueries/index.js";
 
@@ -56,10 +57,7 @@ const findUserService = async (filters) => {
 
     const user = await db.execute(query, queryParams);
 
-    if (!user) {
-      const error = new AppError("User not found", 400, httpStatusText.FAIL);
-      throw error;
-    }
+    checkIfUserExists(user);
 
     return user[0][0];
   } catch (error) {

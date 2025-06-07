@@ -27,6 +27,6 @@ usersRouter
   .route("/register")
   .post(registerUserValidation(), validateRequestBody, createUser);
 
-usersRouter.route("/login").post(loginValidation(), login);
+usersRouter.route("/login").post(loginValidation(), validateRequestBody, login);
 
 export default usersRouter;

@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 import AppError from "../AppError.js";
+import httpStatusText from "../httpStatusText.js";
 
 const compareHashedValues = async (
   value,
