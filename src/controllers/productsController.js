@@ -55,7 +55,7 @@ const updateProduct = asyncWrapper(async (req, res, next) => {
     validatedData.productImage = newProductImage;
   }
 
-  const updatedProduct = await productsService.updateProduct(
+  const updatedProduct = await productsService.updateProductService(
     productId,
     validatedData
   );
@@ -68,12 +68,7 @@ const updateProduct = asyncWrapper(async (req, res, next) => {
 const deleteProduct = asyncWrapper(async (req, res, next) => {
   const { productId } = req.params;
 
-  const findProductAndDelete = await productsService.deleteProduct(productId);
-
-  if (!findProductAndDelete) {
-    const error = new AppError("Invalid Product id", 400, httpStatusText.FAIL);
-    return next(error);
-  }
+  await productsService.deleteProductService(productId);
 
   return res.status(200).json({
     status: httpStatusText.SUCCESS,

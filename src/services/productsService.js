@@ -58,7 +58,7 @@ const createProductService = async (productData) => {
   return product;
 };
 
-const updateProduct = async (productId, data) => {
+const updateProductService = async (productId, data) => {
   const fieldsToUpdate = Object.keys(data)
     .map((field) => `${camelToSnake(field)} = ?, `)
     .join("")
@@ -77,10 +77,12 @@ const updateProduct = async (productId, data) => {
   return updatedProduct;
 };
 
-const deleteProduct = async (id) => {
+const deleteProductService = async (id) => {
   const query = productsServiceQueries.deleteProductQuery;
 
   const [result] = await db.execute(query, [id]);
+
+  checkIfResourceExists(result.affectedRows, "Product not found");
 
   return result.affectedRows;
 };
@@ -108,7 +110,7 @@ export default {
   findProductsByIds,
   findProductService,
   createProductService,
-  updateProduct,
-  deleteProduct,
+  updateProductService,
+  deleteProductService,
   decrementProductStockQuantity,
 };

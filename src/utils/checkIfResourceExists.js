@@ -3,7 +3,7 @@ import httpStatusText from "./httpStatusText.js";
 
 const checkIfResourceExists = (resource, message) => {
   if (!resource) {
-    const error = new AppError(message, 400, httpStatusText.ERROR);
+    const error = new AppError(message, 404, httpStatusText.NOT_FOUND);
     throw error;
   }
 };

@@ -4,4 +4,6 @@ const FAIL = "failed";
 
 const ERROR = "error";
 
-export default { SUCCESS, FAIL, ERROR };
+const NOT_FOUND = "not found";
+
+export default { SUCCESS, FAIL, ERROR, NOT_FOUND };
