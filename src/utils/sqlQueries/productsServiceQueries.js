@@ -66,6 +66,23 @@ const deleteProductQuery = `
   ${productWhereClauseQuery}
 `;
 
+const decrementProductStockQuantityQuery = (products) => {
+  const productCaseStatement = products
+    .map((_, i) => `WHEN product_id = ? THEN stock_quantity - ?`)
+    .join(" ");
+
+  const productIds = products.map(() => "?").join(", ");
+
+  return `
+    UPDATE 
+      products
+    SET 
+      stock_quantity = CASE
+      ${productCaseStatement}
+    END
+    WHERE product_id IN (${productIds});`;
+};
+
 export default {
   findProductsQuery,
   findProductQuery,
@@ -73,4 +90,5 @@ export default {
   createProductQuery,
   updateProductQuery,
   deleteProductQuery,
+  decrementProductStockQuantityQuery,
 };

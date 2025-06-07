@@ -85,20 +85,15 @@ const deleteProductService = async (id) => {
 };
 
 const decrementProductStockQuantity = async (products) => {
-  const query = `
-  UPDATE products
-  SET stock_quantity = CASE
-  ${products
-    .map((_, i) => `WHEN product_id = ? THEN stock_quantity - ?`)
-    .join(" ")}
-  END
-  WHERE product_id IN (${products.map(() => "?").join(", ")});`;
+  const query =
+    productsServiceQueries.decrementProductStockQuantityQuery(products);
 
-  const values = products
+  const queryParams = products
     .flatMap((product) => [product.id, product.quantity])
     .concat(products.map((product) => product.id));
 
-  const [result] = await db.execute(query, values);
+  const [result] = await db.execute(query, queryParams);
+
   return result.affectedRows;
 };
 
