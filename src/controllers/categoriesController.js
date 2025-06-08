@@ -5,7 +5,8 @@ import httpStatusText from "../utils/httpStatusText.js";
 import categoriesService from "../services/categoriesService.js";
 
 const getAllCategories = asyncWrapper(async (req, res, next) => {
-  const categories = await categoriesService.findAllCategories();
+  const categories = await categoriesService.findAllCategoriesService();
+
   return res
     .status(200)
     .json({ status: httpStatusText.SUCCESS, data: { categories } });

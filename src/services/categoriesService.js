@@ -1,8 +1,8 @@
 import db from "../configs/connectToDb.js";
 import { categoriesServiceQueries } from "../utils/sqlQueries/index.js";
 
-const findAllCategories = async () => {
-  const query = categoriesServiceQueries.findAllCategoriesQuery;
+const findAllCategoriesService = async () => {
+  const query = categoriesServiceQueries.findCategoriesQuery;
 
   const [categories] = await db.query(query);
 
@@ -50,7 +50,7 @@ const deleteCategory = async (id) => {
 };
 
 export default {
-  findAllCategories,
+  findAllCategoriesService,
   findCategory,
   addNewCategory,
   updateCategory,
