@@ -13,11 +13,11 @@ const findAllBrandsService = async () => {
 const findBrandService = async (brandId) => {
   const query = brandsServiceQueries.findBrandQuery;
 
-  const brand = await db.execute(query, [brandId]);
+  const [brand] = await db.execute(query, [brandId]);
 
-  checkIfResourceExists(brand, "brand not found");
+  checkIfResourceExists(brand.length, "brand not found");
 
-  return brand[0][0];
+  return brand[0];
 };
 
 const createBrandService = async (brandName) => {

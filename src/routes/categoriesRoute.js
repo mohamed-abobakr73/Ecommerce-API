@@ -6,14 +6,18 @@ import {
   updateCategory,
   deleteCategory,
 } from "../controllers/categoriesController.js";
-import categoriesBrandsValidation from "../middlewares/categoriesBrandsValidation.js";
-import verifyToken from "../middlewares/verifyToken.js";
-import isAllowed from "../middlewares/isAllowed.js";
+import {
+  categoriesBrandsValidation,
+  verifyToken,
+  isAllowed,
+  validateRequestBody,
+} from "../middlewares/index.js";
 import usersRoles from "../utils/usersRoles.js";
 
 const categoriesRouter = Router();
 
 categoriesRouter.route("/").get(getAllCategories);
+
 categoriesRouter.route("/:categoryId").get(getCategory);
 
 categoriesRouter
@@ -22,12 +26,19 @@ categoriesRouter
     verifyToken,
     isAllowed(usersRoles.ADMIN),
     categoriesBrandsValidation("category"),
+    validateRequestBody,
     createCategory
   );
 
 categoriesRouter
   .route("/:categoryId")
-  .patch(verifyToken, isAllowed(usersRoles.ADMIN), updateCategory);
+  .patch(
+    verifyToken,
+    isAllowed(usersRoles.ADMIN),
+    categoriesBrandsValidation("category"),
+    validateRequestBody,
+    updateCategory
+  );
 
 categoriesRouter
   .route("/:categoryId")

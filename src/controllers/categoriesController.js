@@ -1,11 +1,11 @@
-import { validationResult } from "express-validator";
 import { asyncWrapper } from "../middlewares/asyncWrapper.js";
 import AppError from "../utils/AppError.js";
 import httpStatusText from "../utils/httpStatusText.js";
 import categoriesService from "../services/categoriesService.js";
 
 const getAllCategories = asyncWrapper(async (req, res, next) => {
-  const categories = await categoriesService.findAllCategories();
+  const categories = await categoriesService.findAllCategoriesService();
+
   return res
     .status(200)
     .json({ status: httpStatusText.SUCCESS, data: { categories } });
@@ -13,12 +13,8 @@ const getAllCategories = asyncWrapper(async (req, res, next) => {
 
 const getCategory = asyncWrapper(async (req, res, next) => {
   const { categoryId } = req.params;
-  const category = await categoriesService.findCategory(categoryId);
 
-  if (!category) {
-    const error = new AppError("Category not found", 400, httpStatusText.FAIL);
-    return next(error);
-  }
+  const category = await categoriesService.findCategoryService(categoryId);
 
   return res
     .status(200)
@@ -28,13 +24,9 @@ const getCategory = asyncWrapper(async (req, res, next) => {
 const createCategory = asyncWrapper(async (req, res, next) => {
   const { categoryName } = req.body;
 
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    const error = new AppError(errors.array(), 400, httpStatusText.FAIL);
-    return next(error);
-  }
-
-  const newCategoryId = await categoriesService.addNewCategory(categoryName);
+  const newCategoryId = await categoriesService.createCategoryService(
+    categoryName
+  );
 
   const categoryData = {
     id: newCategoryId,
@@ -43,24 +35,20 @@ const createCategory = asyncWrapper(async (req, res, next) => {
 
   return res
     .status(201)
-    .json({ status: httpStatusText.SUCCESS, data: { categoryData } });
+    .json({ status: httpStatusText.SUCCESS, data: { category: categoryData } });
 });
 
 const updateCategory = asyncWrapper(async (req, res, next) => {
   const { categoryId } = req.params;
-  const { categoryName } = req.body;
 
-  const findCategoryAndUpdate = await categoriesService.updateCategory(
-    categoryId,
-    categoryName
-  );
+  const validatedData = req.body;
 
-  if (!findCategoryAndUpdate) {
-    const error = new AppError("Invalid category id", 400, httpStatusText.FAIL);
-    return next(error);
-  }
+  const { categoryName } = validatedData;
 
-  const updatedCategory = { id: +categoryId, categoryName };
+  await categoriesService.updateCategoryService(categoryId, categoryName);
+
+  const updatedCategory = { categoryId: +categoryId, categoryName };
+
   return res.status(200).json({
     status: httpStatusText.SUCCESS,
     data: { updatedCategory },
@@ -69,14 +57,8 @@ const updateCategory = asyncWrapper(async (req, res, next) => {
 
 const deleteCategory = asyncWrapper(async (req, res, next) => {
   const { categoryId } = req.params;
-  const findCategoryAndDelete = await categoriesService.deleteCategory(
-    categoryId
-  );
 
-  if (!findCategoryAndDelete) {
-    const error = new AppError("Invalid category id", 400, httpStatusText.FAIL);
-    return next(error);
-  }
+  await categoriesService.deleteCategoryService(categoryId);
 
   return res.status(200).json({
     status: httpStatusText.SUCCESS,

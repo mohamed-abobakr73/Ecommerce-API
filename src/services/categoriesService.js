@@ -1,23 +1,28 @@
 import db from "../configs/connectToDb.js";
+import checkIfResourceExists from "../utils/checkIfResourceExists.js";
 import { categoriesServiceQueries } from "../utils/sqlQueries/index.js";
 
-const findAllCategories = async () => {
-  const query = categoriesServiceQueries.findAllCategoriesQuery;
+const findAllCategoriesService = async () => {
+  const query = categoriesServiceQueries.findCategoriesQuery;
 
   const [categories] = await db.query(query);
 
   return categories;
 };
 
-const findCategory = async (id) => {
+const findCategoryService = async (categoryId) => {
   const query = categoriesServiceQueries.findCategoryQuery;
 
-  const category = await db.execute(query, [id]);
+  const queryParams = [categoryId];
 
-  return category[0][0];
+  const [category] = await db.execute(query, queryParams);
+
+  checkIfResourceExists(category.length, "Category not found");
+
+  return category[0];
 };
 
-const addNewCategory = async (categoryName) => {
+const createCategoryService = async (categoryName) => {
   const query = categoriesServiceQueries.createCategoryQuery;
 
   const queryParams = [categoryName];
@@ -29,30 +34,34 @@ const addNewCategory = async (categoryName) => {
   return categoryId;
 };
 
-const updateCategory = async (id, updatedCategory) => {
+const updateCategoryService = async (categoryId, updatedCategory) => {
   const query = categoriesServiceQueries.updateCategoryQuery;
 
-  const queryParams = [updatedCategory, id];
+  const queryParams = [updatedCategory, categoryId];
 
   const [result] = await db.execute(query, queryParams);
+
+  checkIfResourceExists(result.affectedRows, "Category not found");
 
   return result.affectedRows;
 };
 
-const deleteCategory = async (id) => {
+const deleteCategoryService = async (categoryId) => {
   const query = categoriesServiceQueries.deleteCategoryQuery;
 
-  const queryParams = [id];
+  const queryParams = [categoryId];
 
   const [result] = await db.execute(query, queryParams);
+
+  checkIfResourceExists(result.affectedRows, "Category not found");
 
   return result.affectedRows;
 };
 
 export default {
-  findAllCategories,
-  findCategory,
-  addNewCategory,
-  updateCategory,
-  deleteCategory,
+  findAllCategoriesService,
+  findCategoryService,
+  createCategoryService,
+  updateCategoryService,
+  deleteCategoryService,
 };
