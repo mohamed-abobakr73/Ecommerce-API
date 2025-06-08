@@ -5,15 +5,28 @@ import {
   updateCartItemQuantity,
   deleteCartItem,
 } from "../controllers/cartController.js";
-import { verifyToken } from "../middlewares/index.js";
+import {
+  validateRequestBody,
+  verifyToken,
+  cartItemValidation,
+} from "../middlewares/index.js";
 
 const cartRouter = Router();
 
 cartRouter.route("/").get(verifyToken, getCartItems);
 
-cartRouter.route("/").post(verifyToken, createCartItem);
+cartRouter
+  .route("/")
+  .post(verifyToken, cartItemValidation(), validateRequestBody, createCartItem);
 
-cartRouter.route("/:cartItemId").patch(verifyToken, updateCartItemQuantity);
+cartRouter
+  .route("/:cartItemId")
+  .patch(
+    verifyToken,
+    cartItemValidation(true),
+    validateRequestBody,
+    updateCartItemQuantity
+  );
 
 cartRouter.route("/:cartItemId").delete(verifyToken, deleteCartItem);
 
