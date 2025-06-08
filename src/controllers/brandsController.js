@@ -14,12 +14,8 @@ const getAllBrands = asyncWrapper(async (req, res, next) => {
 
 const getBrand = asyncWrapper(async (req, res, next) => {
   const { brandId } = req.params;
-  const brand = await brandsService.findBrand(brandId);
 
-  if (!brand) {
-    const error = new AppError("Brand not found", 400, httpStatusText.FAIL);
-    return next(error);
-  }
+  const brand = await brandsService.findBrandService(brandId);
 
   return res
     .status(200)

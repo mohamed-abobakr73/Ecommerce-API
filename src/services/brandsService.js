@@ -1,4 +1,5 @@
 import db from "../configs/connectToDb.js";
+import checkIfResourceExists from "../utils/checkIfResourceExists.js";
 import { brandsServiceQueries } from "../utils/sqlQueries/index.js";
 
 const findAllBrandsService = async () => {
@@ -9,10 +10,12 @@ const findAllBrandsService = async () => {
   return brands;
 };
 
-const findBrand = async (id) => {
+const findBrandService = async (brandId) => {
   const query = brandsServiceQueries.findBrandQuery;
 
-  const brand = await db.execute(query, [id]);
+  const brand = await db.execute(query, [brandId]);
+
+  checkIfResourceExists(brand, "brand not found");
 
   return brand[0][0];
 };
@@ -44,7 +47,7 @@ const deleteBrand = async (id) => {
 
 export default {
   findAllBrandsService,
-  findBrand,
+  findBrandService,
   addNewBrand,
   updateBrand,
   deleteBrand,
