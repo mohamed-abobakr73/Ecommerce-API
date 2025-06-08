@@ -46,6 +46,40 @@ const getNewQuantity = (quantity, currentProductQuantity) => {
   }
 };
 
+const separateCartItemDetails = (cartItemsArray) => {
+  const cartArray = cartItemsArray.map((cartItemData) => {
+    const seller = {
+      firstName: cartItemData.firstName,
+      lastName: cartItemData.lastName,
+      email: cartItemData.email,
+      phone: cartItemData.phone,
+      roleName: cartItemData.roleName,
+    };
+
+    const product = {
+      productId: cartItemData.productId,
+      productName: cartItemData.productName,
+      productDescription: cartItemData.productDescription,
+      price: cartItemData.price,
+      stockQuantity: cartItemData.stockQuantity,
+      createdAt: cartItemData.createdAt,
+      brandName: cartItemData.brandName,
+      categoryName: cartItemData.categoryName,
+      imagePath: cartItemData.imagePath,
+    };
+
+    const cartItem = {
+      cartItemId: cartItemData.cartItemId,
+      cartId: cartItemData.cartId,
+      quantity: cartItemData.quantity,
+    };
+
+    return { cartItem, product, seller };
+  });
+
+  return cartArray;
+};
+
 const findCartId = async (userId) => {
   const query = cartServiceQueries.findCartIdQuery;
 
@@ -71,15 +105,7 @@ const findCartItems = async (userId) => {
     return { cartId, userCartItems: [] };
   }
 
-  const productsIds = cartItems.map((product) => product.productId);
-
-  const products = await productsService.findProductsByIdsService(productsIds);
-
-  const userCartItems = products.map((product, idx) => ({
-    cartItemId: cartItems[idx].cartItemId,
-    product,
-    quantity: cartItems[idx].quantity,
-  }));
+  const userCartItems = separateCartItemDetails(cartItems);
 
   return { cartId, userCartItems };
 };
@@ -114,9 +140,9 @@ const createCartItemService = async (data) => {
   if (cartItem) {
     query = cartServiceQueries.updateCartItemQuantityQuery;
 
-    newQuantity = getNewQuantity(quantity, cartItem.quantity);
+    newQuantity = getNewQuantity(quantity, cartItem.cartItem.quantity);
 
-    cartItemId = cartItem.cartItemId;
+    cartItemId = cartItem.cartItem.cartItemId;
 
     queryParams = [newQuantity, cartItemId];
 

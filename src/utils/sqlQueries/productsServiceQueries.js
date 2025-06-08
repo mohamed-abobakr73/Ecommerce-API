@@ -1,4 +1,3 @@
-import { getProduct } from "../../controllers/productsController.js";
 import snakeToCamel from "../snakeToCamel.js";
 import usersServiceQueries from "./usersServiceQueries.js";
 
@@ -17,7 +16,6 @@ const findProductsQuery = `
     brand_name AS ${snakeToCamel("brand_name")},
     image_path AS ${snakeToCamel("image_path")},
     products.created_at AS ${snakeToCamel("created_at")},
-
     ${usersServiceQueries.findUserFields}
   FROM
     products
