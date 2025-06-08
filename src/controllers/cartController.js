@@ -7,26 +7,12 @@ import httpStatusText from "../utils/httpStatusText.js";
 
 const getCartItems = asyncWrapper(async (req, res, next) => {
   const { userId } = req.query;
-  const cart = await cartService.findCartItems(userId);
 
-  if (!cart) {
-    const error = new AppError("Invalid user id", 400, httpStatusText.ERROR);
-    return next(error);
-  }
-
-  const { cartId, cartItems } = cart;
-  const productsIds = cartItems.map((product) => product.product_id);
-  const products = await productsService.findProductsByIds(productsIds);
-
-  const userCartItems = products.map((product, idx) => ({
-    cartItemId: cartItems[idx].cart_items_id,
-    product,
-    quantity: cartItems[idx].quantity,
-  }));
+  const cartItems = await cartService.findCartItems(userId);
 
   return res
     .status(200)
-    .json({ status: httpStatusText.SUCCESS, data: { userCartItems } });
+    .json({ status: httpStatusText.SUCCESS, data: { cartItems } });
 });
 
 const addItemToCart = asyncWrapper(async (req, res, next) => {

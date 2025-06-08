@@ -1,12 +1,18 @@
 import db from "../configs/connectToDb.js";
+import checkIfResourceExists from "../utils/checkIfResourceExists.js";
 import { cartServiceQueries } from "../utils/sqlQueries/index.js";
+import productsService from "./productsService.js";
 
 // TODO CHECK the add item to cart query and logic
 
 const findCartId = async (userId) => {
   const query = cartServiceQueries.findCartIdQuery;
 
-  const [[{ cart_id: cartId }]] = await db.execute(query, [userId]);
+  const queryParams = [userId];
+
+  const [[{ cart_id: cartId }]] = await db.execute(query, queryParams);
+
+  checkIfResourceExists(cartId, "Cart not found");
 
   return cartId;
 };
@@ -14,15 +20,23 @@ const findCartId = async (userId) => {
 const findCartItems = async (userId) => {
   const cartId = await findCartId(userId);
 
-  if (!cartId) {
-    return;
-  }
-
   const query = cartServiceQueries.findCartItemsQuery;
 
-  const [cartItems] = await db.execute(query, [cartId]);
+  const queryParams = [cartId];
 
-  return { cartId, cartItems };
+  const [cartItems] = await db.execute(query, queryParams);
+
+  const productsIds = cartItems.map((product) => product.product_id);
+
+  const products = await productsService.findProductsByIds(productsIds);
+
+  const userCartItems = products.map((product, idx) => ({
+    cartItemId: cartItems[idx].cart_items_id,
+    product,
+    quantity: cartItems[idx].quantity,
+  }));
+
+  return userCartItems;
 };
 
 const createUserCartService = async (userId, databaseConnection) => {
