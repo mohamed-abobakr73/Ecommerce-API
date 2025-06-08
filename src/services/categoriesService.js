@@ -34,12 +34,14 @@ const createCategoryService = async (categoryName) => {
   return categoryId;
 };
 
-const updateCategory = async (id, updatedCategory) => {
+const updateCategoryService = async (id, updatedCategory) => {
   const query = categoriesServiceQueries.updateCategoryQuery;
 
   const queryParams = [updatedCategory, id];
 
   const [result] = await db.execute(query, queryParams);
+
+  checkIfResourceExists(result.affectedRows, "Category not found");
 
   return result.affectedRows;
 };
@@ -58,6 +60,6 @@ export default {
   findAllCategoriesService,
   findCategoryService,
   createCategoryService,
-  updateCategory,
+  updateCategoryService,
   deleteCategory,
 };

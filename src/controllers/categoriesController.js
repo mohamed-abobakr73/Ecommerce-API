@@ -40,19 +40,15 @@ const createCategory = asyncWrapper(async (req, res, next) => {
 
 const updateCategory = asyncWrapper(async (req, res, next) => {
   const { categoryId } = req.params;
-  const { categoryName } = req.body;
 
-  const findCategoryAndUpdate = await categoriesService.updateCategory(
-    categoryId,
-    categoryName
-  );
+  const validatedData = req.body;
 
-  if (!findCategoryAndUpdate) {
-    const error = new AppError("Invalid category id", 400, httpStatusText.FAIL);
-    return next(error);
-  }
+  const { categoryName } = validatedData;
 
-  const updatedCategory = { id: +categoryId, categoryName };
+  await categoriesService.updateCategoryService(categoryId, categoryName);
+
+  const updatedCategory = { categoryId: +categoryId, categoryName };
+
   return res.status(200).json({
     status: httpStatusText.SUCCESS,
     data: { updatedCategory },
