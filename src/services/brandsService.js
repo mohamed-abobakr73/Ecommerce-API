@@ -42,10 +42,15 @@ const updateBrandService = async (brandId, newBrandName) => {
   return result.affectedRows;
 };
 
-const deleteBrand = async (id) => {
+const deleteBrandService = async (brandId) => {
   const query = brandsServiceQueries.deleteBrandQuery;
 
-  const [result] = await db.execute(query, [id]);
+  const queryParams = [brandId];
+
+  const [result] = await db.execute(query, queryParams);
+
+  checkIfResourceExists(result.affectedRows, "brand not found");
+
   return result.affectedRows;
 };
 
@@ -54,5 +59,5 @@ export default {
   findBrandService,
   createBrandService,
   updateBrandService,
-  deleteBrand,
+  deleteBrandService,
 };

@@ -1,6 +1,4 @@
-import { validationResult } from "express-validator";
 import { asyncWrapper } from "../middlewares/asyncWrapper.js";
-import AppError from "../utils/AppError.js";
 import httpStatusText from "../utils/httpStatusText.js";
 import brandsService from "../services/brandsService.js";
 
@@ -58,12 +56,8 @@ const updateBrand = asyncWrapper(async (req, res, next) => {
 
 const deleteBrand = asyncWrapper(async (req, res, next) => {
   const { brandId } = req.params;
-  const findBrandAndDelete = await brandsService.deleteBrand(brandId);
 
-  if (!findBrandAndDelete) {
-    const error = new AppError("Invalid Brand id", 400, httpStatusText.FAIL);
-    return next(error);
-  }
+  await brandsService.deleteBrandService(brandId);
 
   return res.status(200).json({
     status: httpStatusText.SUCCESS,
