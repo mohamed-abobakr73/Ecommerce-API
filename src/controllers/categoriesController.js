@@ -14,12 +14,8 @@ const getAllCategories = asyncWrapper(async (req, res, next) => {
 
 const getCategory = asyncWrapper(async (req, res, next) => {
   const { categoryId } = req.params;
-  const category = await categoriesService.findCategory(categoryId);
 
-  if (!category) {
-    const error = new AppError("Category not found", 400, httpStatusText.FAIL);
-    return next(error);
-  }
+  const category = await categoriesService.findCategoryService(categoryId);
 
   return res
     .status(200)

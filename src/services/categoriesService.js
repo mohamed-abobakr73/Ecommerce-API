@@ -1,4 +1,5 @@
 import db from "../configs/connectToDb.js";
+import checkIfResourceExists from "../utils/checkIfResourceExists.js";
 import { categoriesServiceQueries } from "../utils/sqlQueries/index.js";
 
 const findAllCategoriesService = async () => {
@@ -9,12 +10,16 @@ const findAllCategoriesService = async () => {
   return categories;
 };
 
-const findCategory = async (id) => {
+const findCategoryService = async (categoryId) => {
   const query = categoriesServiceQueries.findCategoryQuery;
 
-  const category = await db.execute(query, [id]);
+  const queryParams = [categoryId];
 
-  return category[0][0];
+  const [category] = await db.execute(query, queryParams);
+
+  checkIfResourceExists(category.length, "Category not found");
+
+  return category[0];
 };
 
 const addNewCategory = async (categoryName) => {
@@ -51,7 +56,7 @@ const deleteCategory = async (id) => {
 
 export default {
   findAllCategoriesService,
-  findCategory,
+  findCategoryService,
   addNewCategory,
   updateCategory,
   deleteCategory,
