@@ -193,10 +193,14 @@ const updateCartItemQuantityService = async (data) => {
   return result.affectedRows;
 };
 
-const deleteItemFromCart = async (id) => {
+const deleteItemFromCartService = async (cartItemId) => {
   const query = cartServiceQueries.deleteCartItemQuery;
 
-  const [result] = await db.execute(query, [id]);
+  const queryParams = [cartItemId];
+
+  const [result] = await db.execute(query, queryParams);
+
+  checkIfResourceExists(result.affectedRows, "cart item not found");
 
   return result.affectedRows;
 };
@@ -207,5 +211,5 @@ export default {
   createUserCartService,
   createCartItemService,
   updateCartItemQuantityService,
-  deleteItemFromCart,
+  deleteItemFromCartService,
 };

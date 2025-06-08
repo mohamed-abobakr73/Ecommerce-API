@@ -1,7 +1,5 @@
 import { asyncWrapper } from "../middlewares/asyncWrapper.js";
-import { validationResult } from "express-validator";
 import cartService from "../services/cartService.js";
-import AppError from "../utils/AppError.js";
 import httpStatusText from "../utils/httpStatusText.js";
 
 const getCartItems = asyncWrapper(async (req, res, next) => {
@@ -49,16 +47,8 @@ const updateCartItemQuantity = asyncWrapper(async (req, res, next) => {
 
 const deleteCartItem = asyncWrapper(async (req, res, next) => {
   const { cartItemId } = req.params;
-  const result = await cartService.deleteItemFromCart(+cartItemId);
 
-  if (!result) {
-    const error = new AppError(
-      "Invalid cart item id",
-      400,
-      httpStatusText.FAIL
-    );
-    return next(error);
-  }
+  await cartService.deleteItemFromCartService(+cartItemId);
 
   return res.status(200).json({
     status: httpStatusText.SUCCESS,
