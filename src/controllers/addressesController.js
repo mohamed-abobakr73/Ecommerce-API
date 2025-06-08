@@ -1,54 +1,26 @@
 import { asyncWrapper } from "../middlewares/asyncWrapper.js";
-import { validationResult } from "express-validator";
-import AppError from "../utils/AppError.js";
 import httpStatusText from "../utils/httpStatusText.js";
-import checkIfUserExists from "../utils/checkIfUserExists.js";
 import addressesService from "../services/addressesService.js";
 
-const getAllAddresses = asyncWrapper(async (req, res, next) => {
+const getUserAddresses = asyncWrapper(async (req, res, next) => {
   const { userId } = req.params;
 
-  const userDoNotExist = await checkIfUserExists(userId);
-  if (userDoNotExist) {
-    const error = new AppError("Invalid user id", 400, httpStatusText.FAIL);
-    return next(error);
-  }
+  const addresses = await addressesService.findUserAddresses(userId);
 
-  const addresses = await addressesService.findAllAddresses(userId);
   return res
     .status(200)
     .json({ status: httpStatusText.SUCCESS, data: { addresses } });
 });
 
 const createAddress = asyncWrapper(async (req, res, next) => {
-  const { userId } = req.body;
+  const validatedData = req.body;
 
-  const userDoNotExist = await checkIfUserExists(userId);
-  if (userDoNotExist) {
-    const error = new AppError("Invalid user id", 400, httpStatusText.FAIL);
-    return next(error);
-  }
-
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    const error = new AppError(errors.array(), 400, httpStatusText.FAIL);
-    return next(error);
-  }
-
-  const addedAddress = await addressesService.addAddress(req.body);
-  if (!addedAddress) {
-    const error = new AppError(
-      "Something went wrong, please try again later",
-      400,
-      httpStatusText.FAIL
-    );
-    return next(error);
-  }
+  await addressesService.createAddressService(validatedData);
 
   return res.status(201).json({
     status: httpStatusText.SUCCESS,
-    data: { createdAddress: req.body },
+    data: { createdAddress: validatedData },
   });
 });
 
-export { getAllAddresses, createAddress };
+export { getUserAddresses, createAddress };

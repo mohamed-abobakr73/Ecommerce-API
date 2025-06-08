@@ -16,7 +16,7 @@ import {
   addressesRouter,
 } from "./routes/index.js";
 import morgan from "morgan";
-import globalErrorHandler from "./middlewares/globalErrorHandler.js";
+import { globalErrorHandler } from "./middlewares/index.js";
 
 const app = express();
 

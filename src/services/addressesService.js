@@ -1,15 +1,28 @@
 import db from "../configs/connectToDb.js";
-import { addressesServiceQueries } from "../utils/sqlQueries/index.js";
+import checkIfResourceExists from "../utils/checkIfResourceExists.js";
+import {
+  addressesServiceQueries,
+  usersServiceQueries,
+} from "../utils/sqlQueries/index.js";
 
-const findAllAddresses = async (userId) => {
+const findUserAddresses = async (userId) => {
+  const [userExists] = await db.execute(
+    usersServiceQueries.checkIfUserExistsByIdQuery,
+    [userId]
+  );
+
+  checkIfResourceExists(userExists.length, "User not found");
+
   const query = addressesServiceQueries.findAllAddressesQuery;
 
-  const [result] = await db.execute(query, [userId]);
+  const queryParams = [userId];
+
+  const [result] = await db.execute(query, queryParams);
 
   return result;
 };
 
-const addAddress = async (addressData) => {
+const createAddressService = async (addressData) => {
   const query = addressesServiceQueries.addAddressQuery;
 
   const queryParams = [
@@ -22,9 +35,9 @@ const addAddress = async (addressData) => {
     addressData.isDefault || true,
   ];
 
-  const [result] = await db.query(query, queryParams);
+  const [result] = await db.execute(query, queryParams);
 
   return result.affectedRows;
 };
 
-export default { findAllAddresses, addAddress };
+export default { findUserAddresses, createAddressService };

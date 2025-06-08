@@ -1,6 +1,10 @@
 const findAllAddressesQuery = `
-  SELECT * FROM addresses
-  WHERE user_id = ?
+  SELECT 
+    * 
+  FROM 
+    addresses
+  WHERE 
+    user_id = ?
 `;
 
 const addAddressQuery = `

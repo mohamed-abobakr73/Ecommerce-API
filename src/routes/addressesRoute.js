@@ -1,16 +1,20 @@
 import { Router } from "express";
 import {
   createAddress,
-  getAllAddresses,
+  getUserAddresses,
 } from "../controllers/addressesController.js";
-import addressesValidation from "../middlewares/addressesValidation.js";
-import verifyToken from "../middlewares/verifyToken.js";
+import {
+  addressesValidation,
+  verifyToken,
+  validateRequestBody,
+} from "../middlewares/index.js";
+
 const addressesRouter = Router();
 
-addressesRouter.route("/:userId").get(getAllAddresses);
+addressesRouter.route("/:userId").get(getUserAddresses);
 
 addressesRouter
   .route("/")
-  .post(verifyToken, addressesValidation(), createAddress);
+  .post(verifyToken, addressesValidation(), validateRequestBody, createAddress);
 
 export default addressesRouter;
