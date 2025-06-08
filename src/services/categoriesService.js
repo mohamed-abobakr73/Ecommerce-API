@@ -22,7 +22,7 @@ const findCategoryService = async (categoryId) => {
   return category[0];
 };
 
-const addNewCategory = async (categoryName) => {
+const createCategoryService = async (categoryName) => {
   const query = categoriesServiceQueries.createCategoryQuery;
 
   const queryParams = [categoryName];
@@ -57,7 +57,7 @@ const deleteCategory = async (id) => {
 export default {
   findAllCategoriesService,
   findCategoryService,
-  addNewCategory,
+  createCategoryService,
   updateCategory,
   deleteCategory,
 };

@@ -1,4 +1,3 @@
-import { validationResult } from "express-validator";
 import { asyncWrapper } from "../middlewares/asyncWrapper.js";
 import AppError from "../utils/AppError.js";
 import httpStatusText from "../utils/httpStatusText.js";
@@ -25,13 +24,9 @@ const getCategory = asyncWrapper(async (req, res, next) => {
 const createCategory = asyncWrapper(async (req, res, next) => {
   const { categoryName } = req.body;
 
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    const error = new AppError(errors.array(), 400, httpStatusText.FAIL);
-    return next(error);
-  }
-
-  const newCategoryId = await categoriesService.addNewCategory(categoryName);
+  const newCategoryId = await categoriesService.createCategoryService(
+    categoryName
+  );
 
   const categoryData = {
     id: newCategoryId,
@@ -40,7 +35,7 @@ const createCategory = asyncWrapper(async (req, res, next) => {
 
   return res
     .status(201)
-    .json({ status: httpStatusText.SUCCESS, data: { categoryData } });
+    .json({ status: httpStatusText.SUCCESS, data: { category: categoryData } });
 });
 
 const updateCategory = asyncWrapper(async (req, res, next) => {
