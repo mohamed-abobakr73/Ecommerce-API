@@ -57,14 +57,8 @@ const updateCategory = asyncWrapper(async (req, res, next) => {
 
 const deleteCategory = asyncWrapper(async (req, res, next) => {
   const { categoryId } = req.params;
-  const findCategoryAndDelete = await categoriesService.deleteCategory(
-    categoryId
-  );
 
-  if (!findCategoryAndDelete) {
-    const error = new AppError("Invalid category id", 400, httpStatusText.FAIL);
-    return next(error);
-  }
+  await categoriesService.deleteCategoryService(categoryId);
 
   return res.status(200).json({
     status: httpStatusText.SUCCESS,

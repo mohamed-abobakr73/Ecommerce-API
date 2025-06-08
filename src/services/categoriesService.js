@@ -34,10 +34,10 @@ const createCategoryService = async (categoryName) => {
   return categoryId;
 };
 
-const updateCategoryService = async (id, updatedCategory) => {
+const updateCategoryService = async (categoryId, updatedCategory) => {
   const query = categoriesServiceQueries.updateCategoryQuery;
 
-  const queryParams = [updatedCategory, id];
+  const queryParams = [updatedCategory, categoryId];
 
   const [result] = await db.execute(query, queryParams);
 
@@ -46,12 +46,14 @@ const updateCategoryService = async (id, updatedCategory) => {
   return result.affectedRows;
 };
 
-const deleteCategory = async (id) => {
+const deleteCategoryService = async (categoryId) => {
   const query = categoriesServiceQueries.deleteCategoryQuery;
 
-  const queryParams = [id];
+  const queryParams = [categoryId];
 
   const [result] = await db.execute(query, queryParams);
+
+  checkIfResourceExists(result.affectedRows, "Category not found");
 
   return result.affectedRows;
 };
@@ -61,5 +63,5 @@ export default {
   findCategoryService,
   createCategoryService,
   updateCategoryService,
-  deleteCategory,
+  deleteCategoryService,
 };
