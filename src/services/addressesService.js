@@ -1,7 +1,18 @@
 import db from "../configs/connectToDb.js";
-import { addressesServiceQueries } from "../utils/sqlQueries/index.js";
+import checkIfResourceExists from "../utils/checkIfResourceExists.js";
+import {
+  addressesServiceQueries,
+  usersServiceQueries,
+} from "../utils/sqlQueries/index.js";
 
 const findUserAddresses = async (userId) => {
+  const [userExists] = await db.execute(
+    usersServiceQueries.checkIfUserExistsByIdQuery,
+    [userId]
+  );
+
+  checkIfResourceExists(userExists.length, "User not found");
+
   const query = addressesServiceQueries.findAllAddressesQuery;
 
   const queryParams = [userId];

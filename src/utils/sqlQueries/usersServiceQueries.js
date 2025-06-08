@@ -1,5 +1,14 @@
 import snakeToCamel from "../snakeToCamel.js";
 
+const checkIfUserExistsByIdQuery = `
+    SELECT
+      user_id
+    FROM
+      users
+    WHERE
+      user_id = ?
+  `;
+
 const findUserFields = `
     user_id AS ${snakeToCamel("user_id")},
     first_name AS ${snakeToCamel("first_name")},
@@ -36,6 +45,7 @@ const createUserQuery = `
   `;
 
 export default {
+  checkIfUserExistsByIdQuery,
   findAllUsersQuery,
   findUserFields,
   createUserQuery,
