@@ -1,16 +1,57 @@
 import db from "../configs/connectToDb.js";
+import AppError from "../utils/AppError.js";
 import checkIfResourceExists from "../utils/checkIfResourceExists.js";
+import httpStatusText from "../utils/httpStatusText.js";
 import { cartServiceQueries } from "../utils/sqlQueries/index.js";
 import productsService from "./productsService.js";
 
-// TODO CHECK the add item to cart query and logic
+const checkIfProductIsValidWhenCreatingCartItem = async (productId) => {
+  const product = await productsService.findProductService(productId);
+
+  checkIfResourceExists(product, "Product not found");
+
+  return product;
+};
+
+const checkProductStockQuantity = (product, quantity) => {
+  if (product.stockQuantity < quantity) {
+    const error = new AppError(
+      "Not enough product stock quantity for the requested quantity",
+      400,
+      httpStatusText.ERROR
+    );
+    throw error;
+  }
+};
+
+const getCartItem = async (userId, productId) => {
+  const { cartId, userCartItems: cartItems } = await findCartItems(userId);
+
+  if (!cartItems || cartItems.length === 0) {
+    return { cartId, cartItem: null };
+  }
+
+  const cartItem = cartItems.find(
+    (item) => item.product.productId === productId
+  );
+
+  return { cartId, cartItem };
+};
+
+const getNewQuantity = (quantity, currentProductQuantity) => {
+  if (quantity > 1) {
+    return quantity;
+  } else {
+    return currentProductQuantity + quantity;
+  }
+};
 
 const findCartId = async (userId) => {
   const query = cartServiceQueries.findCartIdQuery;
 
   const queryParams = [userId];
 
-  const [[{ cart_id: cartId }]] = await db.execute(query, queryParams);
+  const [[{ cartId }]] = await db.execute(query, queryParams);
 
   checkIfResourceExists(cartId, "Cart not found");
 
@@ -26,17 +67,21 @@ const findCartItems = async (userId) => {
 
   const [cartItems] = await db.execute(query, queryParams);
 
-  const productsIds = cartItems.map((product) => product.product_id);
+  if (cartItems.length === 0) {
+    return { cartId, userCartItems: [] };
+  }
 
-  const products = await productsService.findProductsByIds(productsIds);
+  const productsIds = cartItems.map((product) => product.productId);
+
+  const products = await productsService.findProductsByIdsService(productsIds);
 
   const userCartItems = products.map((product, idx) => ({
-    cartItemId: cartItems[idx].cart_items_id,
+    cartItemId: cartItems[idx].cartItemId,
     product,
     quantity: cartItems[idx].quantity,
   }));
 
-  return userCartItems;
+  return { cartId, userCartItems };
 };
 
 const createUserCartService = async (userId, databaseConnection) => {
@@ -49,43 +94,59 @@ const createUserCartService = async (userId, databaseConnection) => {
   return result.affectedRows;
 };
 
-const addItemToCart = async (data) => {
+const createCartItemService = async (data) => {
   const { userId, productId, quantity } = data;
-  const { cartId, cartItems } = await findCartItems(userId);
 
-  const productIndex = cartItems.findIndex(
-    (item) => item.product_id === productId
-  );
+  const product = await checkIfProductIsValidWhenCreatingCartItem(productId);
 
-  if (productIndex !== -1) {
-    const query = `UPDATE cart_items
-    SET quantity = ?
-    WHERE product_id = ?
-    `;
+  checkProductStockQuantity(product, quantity);
 
-    let newQuantity;
+  const { cartId, cartItem } = await getCartItem(userId, productId);
 
-    if (quantity > 1) {
-      newQuantity = quantity;
-    } else {
-      const currentProductQuantity = cartItems[productIndex].quantity;
-      newQuantity = currentProductQuantity + quantity;
-    }
+  let query;
+  let queryParams;
+  let cartItemData;
+  let cartItemId;
+  let newQuantity;
+  let result;
+  let errorMessage;
 
-    const [result] = await db.execute(query, [newQuantity, productId]);
+  if (cartItem) {
+    query = cartServiceQueries.updateCartItemQuantityQuery;
 
-    return { result: result.affectedRows, quantity: newQuantity };
+    newQuantity = getNewQuantity(quantity, cartItem.quantity);
+
+    cartItemId = cartItem.cartItemId;
+
+    queryParams = [newQuantity, cartItemId];
+
+    errorMessage = "error updating cart item";
   } else {
-    const query = `INSERT INTO cart_items
-      (cart_id, product_id, quantity)
-    VALUES
-      (?, ?, ?)
-    `;
+    query = cartServiceQueries.addCartItemQuery;
 
-    const [result] = await db.execute(query, [cartId, productId, quantity]);
+    queryParams = [cartId, productId, quantity];
 
-    return { result: result.affectedRows, quantity };
+    newQuantity = quantity;
+
+    errorMessage = "error creating cart item";
   }
+
+  [result] = await db.execute(query, queryParams);
+
+  if (!cartItemId) {
+    cartItemId = result.insertId;
+  }
+
+  checkIfResourceExists(result.affectedRows, errorMessage);
+
+  cartItemData = {
+    cartItemId: cartItemId,
+    cartId,
+    product,
+    quantity: newQuantity,
+  };
+
+  return cartItemData;
 };
 
 const updateCartItemQuantity = async (data) => {
@@ -112,7 +173,7 @@ export default {
   findCartId,
   findCartItems,
   createUserCartService,
-  addItemToCart,
+  createCartItemService,
   updateCartItemQuantity,
   deleteItemFromCart,
 };

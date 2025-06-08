@@ -6,9 +6,16 @@ const findCartIdQuery = `
   FROM cart 
   WHERE user_id  = ?`;
 
+const addCartItemQuery = `
+  INSERT INTO cart_items
+    (cart_id, product_id, quantity)
+  VALUES
+    (?, ?, ?)
+  `;
+
 const findCartItemsQuery = `
   SELECT 
-    cart_items.cart_items_id AS ${snakeToCamel("cart_items_id")},
+    cart_items.cart_items_id AS ${snakeToCamel("cart_item_id")},
     cart_items.cart_id AS ${snakeToCamel("cart_id")},
     cart_items.product_id AS ${snakeToCamel("product_id")},
     cart_items.quantity, 
@@ -53,6 +60,7 @@ export default {
   findCartIdQuery,
   findCartItemsQuery,
   createUserCartQuery,
+  addCartItemQuery,
   updateCartItemQuantityQuery,
   deleteCartItemQuery,
 };

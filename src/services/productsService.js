@@ -13,7 +13,7 @@ const findAllProductsService = async () => {
 };
 
 const findProductsByIdsService = async (productIds) => {
-  const productIdsQuery = ids.map(() => "?").join(", ");
+  const productIdsQuery = productIds.map(() => "?").join(", ");
 
   const query = productsServiceQueries.findProductsByIdsQuery(productIdsQuery);
 
