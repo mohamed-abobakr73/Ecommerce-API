@@ -32,27 +32,15 @@ const createCartItem = asyncWrapper(async (req, res, next) => {
 
 const updateCartItemQuantity = asyncWrapper(async (req, res, next) => {
   const { cartItemId } = req.params;
-  const { quantity } = req.body;
-  const errors = validationResult(req.body);
+  const validatedData = req.body;
 
-  if (!errors.isEmpty()) {
-    const error = new AppError(errors.array(), 400, httpStatusText.FAIL);
-    return next(error);
-  }
+  const { productId, quantity } = validatedData;
 
-  const result = await cartService.updateCartItemQuantity({
+  await cartService.updateCartItemQuantityService({
     cartItemId,
     quantity,
+    productId,
   });
-
-  if (!result) {
-    const error = new AppError(
-      "Invalid cart item id",
-      400,
-      httpStatusText.ERROR
-    );
-    return next(error);
-  }
 
   return res
     .status(200)

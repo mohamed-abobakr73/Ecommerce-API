@@ -5,7 +5,7 @@ import httpStatusText from "../utils/httpStatusText.js";
 import { cartServiceQueries } from "../utils/sqlQueries/index.js";
 import productsService from "./productsService.js";
 
-const checkIfProductIsValidWhenCreatingCartItem = async (productId) => {
+const checkIfProductIsValid = async (productId) => {
   const product = await productsService.findProductService(productId);
 
   checkIfResourceExists(product, "Product not found");
@@ -123,7 +123,7 @@ const createUserCartService = async (userId, databaseConnection) => {
 const createCartItemService = async (data) => {
   const { userId, productId, quantity } = data;
 
-  const product = await checkIfProductIsValidWhenCreatingCartItem(productId);
+  const product = await checkIfProductIsValid(productId);
 
   checkProductStockQuantity(product, quantity);
 
@@ -175,14 +175,20 @@ const createCartItemService = async (data) => {
   return cartItemData;
 };
 
-const updateCartItemQuantity = async (data) => {
-  const { cartItemId, quantity } = data;
+const updateCartItemQuantityService = async (data) => {
+  const { cartItemId, quantity, productId } = data;
+
+  const product = await checkIfProductIsValid(productId, quantity);
+
+  checkProductStockQuantity(product, quantity);
 
   const query = cartServiceQueries.updateCartItemQuantityQuery;
 
   const queryParams = [quantity, cartItemId];
 
   const [result] = await db.execute(query, queryParams);
+
+  checkIfResourceExists(result.affectedRows, "cart item not found");
 
   return result.affectedRows;
 };
@@ -200,6 +206,6 @@ export default {
   findCartItems,
   createUserCartService,
   createCartItemService,
-  updateCartItemQuantity,
+  updateCartItemQuantityService,
   deleteItemFromCart,
 };
