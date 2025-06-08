@@ -25,10 +25,12 @@ const findCartItems = async (userId) => {
   return { cartId, cartItems };
 };
 
-const createUserCart = async (userId) => {
+const createUserCartService = async (userId, databaseConnection) => {
   const query = cartServiceQueries.createUserCartQuery;
 
-  const [result] = await db.execute(query, [userId]);
+  const queryParams = [userId];
+
+  const [result] = await databaseConnection.execute(query, queryParams);
 
   return result.affectedRows;
 };
@@ -95,7 +97,7 @@ const deleteItemFromCart = async (id) => {
 export default {
   findCartId,
   findCartItems,
-  createUserCart,
+  createUserCartService,
   addItemToCart,
   updateCartItemQuantity,
   deleteItemFromCart,
