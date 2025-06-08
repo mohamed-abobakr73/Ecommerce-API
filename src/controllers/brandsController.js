@@ -5,7 +5,8 @@ import httpStatusText from "../utils/httpStatusText.js";
 import brandsService from "../services/brandsService.js";
 
 const getAllBrands = asyncWrapper(async (req, res, next) => {
-  const brands = await brandsService.findAllBrands();
+  const brands = await brandsService.findAllBrandsService();
+
   return res
     .status(200)
     .json({ status: httpStatusText.SUCCESS, data: { brands } });

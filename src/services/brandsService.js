@@ -1,7 +1,7 @@
 import db from "../configs/connectToDb.js";
 import { brandsServiceQueries } from "../utils/sqlQueries/index.js";
 
-const findAllBrands = async () => {
+const findAllBrandsService = async () => {
   const query = brandsServiceQueries.findBrandsQuery;
 
   const [brands] = await db.query(query);
@@ -43,7 +43,7 @@ const deleteBrand = async (id) => {
 };
 
 export default {
-  findAllBrands,
+  findAllBrandsService,
   findBrand,
   addNewBrand,
   updateBrand,
