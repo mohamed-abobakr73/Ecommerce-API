@@ -23,7 +23,9 @@ const getBrand = asyncWrapper(async (req, res, next) => {
 });
 
 const createBrand = asyncWrapper(async (req, res, next) => {
-  const { brandName } = req.body;
+  const validatedData = req.body;
+
+  const { brandName } = validatedData;
 
   const newBrandId = await brandsService.createBrandService(brandName);
 
@@ -39,19 +41,15 @@ const createBrand = asyncWrapper(async (req, res, next) => {
 
 const updateBrand = asyncWrapper(async (req, res, next) => {
   const { brandId } = req.params;
-  const { brandName } = req.body;
 
-  const findBrandAndUpdate = await brandsService.updateBrand(
-    brandId,
-    brandName
-  );
+  const validatedData = req.body;
 
-  if (!findBrandAndUpdate) {
-    const error = new AppError("Invalid Brand id", 400, httpStatusText.FAIL);
-    return next(error);
-  }
+  const { brandName } = validatedData;
 
-  const updatedBrand = { id: +brandId, brandName };
+  await brandsService.updateBrandService(brandId, brandName);
+
+  const updatedBrand = { brandId: +brandId, brandName };
+
   return res.status(200).json({
     status: httpStatusText.SUCCESS,
     data: { updatedBrand },

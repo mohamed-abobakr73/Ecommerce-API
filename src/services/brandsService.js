@@ -30,10 +30,14 @@ const createBrandService = async (brandName) => {
   return brandId;
 };
 
-const updateBrand = async (id, brandToUpdate) => {
+const updateBrandService = async (brandId, newBrandName) => {
   const query = brandsServiceQueries.updateBrandQuery;
 
-  const [result] = await db.execute(query, [brandToUpdate, id]);
+  const queryParams = [newBrandName, brandId];
+
+  const [result] = await db.execute(query, queryParams);
+
+  checkIfResourceExists(result.affectedRows, "brand not found");
 
   return result.affectedRows;
 };
@@ -49,6 +53,6 @@ export default {
   findAllBrandsService,
   findBrandService,
   createBrandService,
-  updateBrand,
+  updateBrandService,
   deleteBrand,
 };
