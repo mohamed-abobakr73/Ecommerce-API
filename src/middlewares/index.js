@@ -12,6 +12,7 @@ import productValidation from "./productValidation.js";
 import validateRequestBody from "./validateRequestBody.js";
 import orderValidation from "./orderValidation.js";
 import reviewsValidation from "./reviewsValidation.js";
+import cartItemValidation from "./cartItemValidation.js";
 
 export {
   addressesValidation,
@@ -28,4 +29,5 @@ export {
   validateRequestBody,
   orderValidation,
   reviewsValidation,
+  cartItemValidation,
 };

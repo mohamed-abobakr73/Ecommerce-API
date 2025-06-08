@@ -16,12 +16,19 @@ import {
   createImagesTable,
 } from "../models/index.js";
 import { seedRoles } from "../utils/sqlQueries/index.js";
-import db from "./connectToDb.js";
+import { configDotenv } from "dotenv";
+import { databaseConnection } from "./connectToDb.js";
+
+configDotenv();
+
+const DATABASE_NAME = process.env.DATABASE_NAME;
 
 const initializeDatabase = async () => {
   try {
-    await db.query(`CREATE DATABASE IF NOT EXISTS ecommerce_db`);
-    await db.query(`USE ecommerce_db`);
+    await databaseConnection.query(
+      `CREATE DATABASE IF NOT EXISTS ${DATABASE_NAME}`
+    );
+    await databaseConnection.query(`USE ${DATABASE_NAME}`);
 
     await createRolesTable();
     await createUsersTable();
@@ -48,6 +55,9 @@ const initializeDatabase = async () => {
 
     await seedRoles();
 
+    await databaseConnection.changeUser({ database: DATABASE_NAME });
+
+    await databaseConnection.end();
     console.log("Database initialized successfully");
   } catch (error) {
     console.log("Database initialization error:", error);

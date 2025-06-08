@@ -1,16 +1,9 @@
 import db from "../configs/connectToDb.js";
-import AppError from "../utils/AppError.js";
+import checkIfResourceExists from "../utils/checkIfResourceExists.js";
 import { hashValue, compareHashedValues } from "../utils/hashingUtils/index.js";
-import httpStatusText from "../utils/httpStatusText.js";
 import { generateJwt } from "../utils/jwtUtils/index.js";
 import { usersServiceQueries } from "../utils/sqlQueries/index.js";
-
-const checkIfUserExists = (user) => {
-  if (!user) {
-    const error = new AppError("User is not found.", 400, httpStatusText.FAIL);
-    throw error;
-  }
-};
+import cartService from "./cartService.js";
 
 const generateTokenWithUserData = async (user) => {
   const { firstName, lastName, email, role } = user;
@@ -57,7 +50,7 @@ const findUserService = async (filters) => {
 
     const user = await db.execute(query, queryParams);
 
-    checkIfUserExists(user);
+    checkIfResourceExists(user, "User not found");
 
     return user[0][0];
   } catch (error) {
@@ -66,32 +59,49 @@ const findUserService = async (filters) => {
 };
 
 const registerUserService = async (userData) => {
-  const query = usersServiceQueries.createUserQuery;
+  let databaseConnection;
+  try {
+    databaseConnection = await db.getConnection();
+    await databaseConnection.beginTransaction();
 
-  const { firstName, lastName, password, email, phone, role } = userData;
+    const query = usersServiceQueries.createUserQuery;
 
-  const hashedPassword = await hashValue(password);
+    const { firstName, lastName, password, email, phone, role } = userData;
 
-  const queryParams = [
-    firstName,
-    lastName,
-    email,
-    hashedPassword,
-    phone,
-    role || 1,
-  ];
+    const hashedPassword = await hashValue(password);
 
-  const [user] = await db.execute(query, queryParams);
+    const queryParams = [
+      firstName,
+      lastName,
+      email,
+      hashedPassword,
+      phone,
+      role || 1,
+    ];
 
-  const token = await generateTokenWithUserData(userData);
+    const [user] = await databaseConnection.execute(query, queryParams);
 
-  return token;
+    const userId = user.insertId;
+
+    await cartService.createUserCartService(userId, databaseConnection);
+
+    const token = await generateTokenWithUserData(userData);
+
+    await databaseConnection.commit();
+
+    return token;
+  } catch (error) {
+    if (databaseConnection) await databaseConnection.rollback();
+    throw error;
+  } finally {
+    if (databaseConnection) await databaseConnection.rollback();
+  }
 };
 
 const loginService = async (email, password) => {
   const user = await findUserService({ email });
 
-  checkIfUserExists(user);
+  checkIfResourceExists(user, "Invalid credentials, please try again.");
 
   await compareHashedValues(
     password,

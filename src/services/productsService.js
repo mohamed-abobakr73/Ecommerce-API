@@ -12,8 +12,8 @@ const findAllProductsService = async () => {
   return products;
 };
 
-const findProductsByIds = async (productIds) => {
-  const productIdsQuery = ids.map(() => "?").join(", ");
+const findProductsByIdsService = async (productIds) => {
+  const productIdsQuery = productIds.map(() => "?").join(", ");
 
   const query = productsServiceQueries.findProductsByIdsQuery(productIdsQuery);
 
@@ -99,7 +99,7 @@ const decrementProductStockQuantity = async (products) => {
 
 export default {
   findAllProductsService,
-  findProductsByIds,
+  findProductsByIdsService,
   findProductService,
   createProductService,
   updateProductService,
