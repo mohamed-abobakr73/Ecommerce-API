@@ -1,11 +1,10 @@
-import { validationResult } from "express-validator";
 import { asyncWrapper } from "../middlewares/asyncWrapper.js";
-import AppError from "../utils/AppError.js";
 import httpStatusText from "../utils/httpStatusText.js";
 import brandsService from "../services/brandsService.js";
 
 const getAllBrands = asyncWrapper(async (req, res, next) => {
-  const brands = await brandsService.findAllBrands();
+  const brands = await brandsService.findAllBrandsService();
+
   return res
     .status(200)
     .json({ status: httpStatusText.SUCCESS, data: { brands } });
@@ -13,12 +12,8 @@ const getAllBrands = asyncWrapper(async (req, res, next) => {
 
 const getBrand = asyncWrapper(async (req, res, next) => {
   const { brandId } = req.params;
-  const brand = await brandsService.findBrand(brandId);
 
-  if (!brand) {
-    const error = new AppError("Brand not found", 400, httpStatusText.FAIL);
-    return next(error);
-  }
+  const brand = await brandsService.findBrandService(brandId);
 
   return res
     .status(200)
@@ -26,15 +21,11 @@ const getBrand = asyncWrapper(async (req, res, next) => {
 });
 
 const createBrand = asyncWrapper(async (req, res, next) => {
-  const { brandName } = req.body;
+  const validatedData = req.body;
 
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    const error = new AppError(errors.array(), 400, httpStatusText.FAIL);
-    return next(error);
-  }
+  const { brandName } = validatedData;
 
-  const newBrandId = await brandsService.addNewBrand(brandName);
+  const newBrandId = await brandsService.createBrandService(brandName);
 
   const brandData = {
     id: newBrandId,
@@ -43,24 +34,20 @@ const createBrand = asyncWrapper(async (req, res, next) => {
 
   return res
     .status(201)
-    .json({ status: httpStatusText.SUCCESS, data: { brandData } });
+    .json({ status: httpStatusText.SUCCESS, data: { brand: brandData } });
 });
 
 const updateBrand = asyncWrapper(async (req, res, next) => {
   const { brandId } = req.params;
-  const { brandName } = req.body;
 
-  const findBrandAndUpdate = await brandsService.updateBrand(
-    brandId,
-    brandName
-  );
+  const validatedData = req.body;
 
-  if (!findBrandAndUpdate) {
-    const error = new AppError("Invalid Brand id", 400, httpStatusText.FAIL);
-    return next(error);
-  }
+  const { brandName } = validatedData;
 
-  const updatedBrand = { id: +brandId, brandName };
+  await brandsService.updateBrandService(brandId, brandName);
+
+  const updatedBrand = { brandId: +brandId, brandName };
+
   return res.status(200).json({
     status: httpStatusText.SUCCESS,
     data: { updatedBrand },
@@ -69,12 +56,8 @@ const updateBrand = asyncWrapper(async (req, res, next) => {
 
 const deleteBrand = asyncWrapper(async (req, res, next) => {
   const { brandId } = req.params;
-  const findBrandAndDelete = await brandsService.deleteBrand(brandId);
 
-  if (!findBrandAndDelete) {
-    const error = new AppError("Invalid Brand id", 400, httpStatusText.FAIL);
-    return next(error);
-  }
+  await brandsService.deleteBrandService(brandId);
 
   return res.status(200).json({
     status: httpStatusText.SUCCESS,

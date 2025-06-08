@@ -1,7 +1,8 @@
 import db from "../configs/connectToDb.js";
+import checkIfResourceExists from "../utils/checkIfResourceExists.js";
 import { brandsServiceQueries } from "../utils/sqlQueries/index.js";
 
-const findAllBrands = async () => {
+const findAllBrandsService = async () => {
   const query = brandsServiceQueries.findBrandsQuery;
 
   const [brands] = await db.query(query);
@@ -9,15 +10,17 @@ const findAllBrands = async () => {
   return brands;
 };
 
-const findBrand = async (id) => {
+const findBrandService = async (brandId) => {
   const query = brandsServiceQueries.findBrandQuery;
 
-  const brand = await db.execute(query, [id]);
+  const brand = await db.execute(query, [brandId]);
+
+  checkIfResourceExists(brand, "brand not found");
 
   return brand[0][0];
 };
 
-const addNewBrand = async (brandName) => {
+const createBrandService = async (brandName) => {
   const query = brandsServiceQueries.createBrandQuery;
 
   const [result] = await db.execute(query, [brandName]);
@@ -27,25 +30,34 @@ const addNewBrand = async (brandName) => {
   return brandId;
 };
 
-const updateBrand = async (id, brandToUpdate) => {
+const updateBrandService = async (brandId, newBrandName) => {
   const query = brandsServiceQueries.updateBrandQuery;
 
-  const [result] = await db.execute(query, [brandToUpdate, id]);
+  const queryParams = [newBrandName, brandId];
+
+  const [result] = await db.execute(query, queryParams);
+
+  checkIfResourceExists(result.affectedRows, "brand not found");
 
   return result.affectedRows;
 };
 
-const deleteBrand = async (id) => {
+const deleteBrandService = async (brandId) => {
   const query = brandsServiceQueries.deleteBrandQuery;
 
-  const [result] = await db.execute(query, [id]);
+  const queryParams = [brandId];
+
+  const [result] = await db.execute(query, queryParams);
+
+  checkIfResourceExists(result.affectedRows, "brand not found");
+
   return result.affectedRows;
 };
 
 export default {
-  findAllBrands,
-  findBrand,
-  addNewBrand,
-  updateBrand,
-  deleteBrand,
+  findAllBrandsService,
+  findBrandService,
+  createBrandService,
+  updateBrandService,
+  deleteBrandService,
 };
