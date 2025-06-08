@@ -14,7 +14,9 @@ import usersRoles from "../utils/usersRoles.js";
 const brandsRouter = Router();
 
 brandsRouter.route("/").get(getAllBrands);
+
 brandsRouter.route("/:brandId").get(getBrand);
+
 brandsRouter
   .route("/")
   .post(
@@ -23,9 +25,11 @@ brandsRouter
     categoriesBrandsValidation("brand"),
     createBrand
   );
+
 brandsRouter
   .route("/:brandId")
   .patch(verifyToken, isAllowed(usersRoles.ADMIN), updateBrand);
+
 brandsRouter
   .route("/:brandId")
   .delete(verifyToken, isAllowed(usersRoles.ADMIN), deleteBrand);

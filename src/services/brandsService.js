@@ -20,7 +20,7 @@ const findBrandService = async (brandId) => {
   return brand[0][0];
 };
 
-const addNewBrand = async (brandName) => {
+const createBrandService = async (brandName) => {
   const query = brandsServiceQueries.createBrandQuery;
 
   const [result] = await db.execute(query, [brandName]);
@@ -48,7 +48,7 @@ const deleteBrand = async (id) => {
 export default {
   findAllBrandsService,
   findBrandService,
-  addNewBrand,
+  createBrandService,
   updateBrand,
   deleteBrand,
 };

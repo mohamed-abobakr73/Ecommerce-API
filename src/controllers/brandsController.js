@@ -25,13 +25,7 @@ const getBrand = asyncWrapper(async (req, res, next) => {
 const createBrand = asyncWrapper(async (req, res, next) => {
   const { brandName } = req.body;
 
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    const error = new AppError(errors.array(), 400, httpStatusText.FAIL);
-    return next(error);
-  }
-
-  const newBrandId = await brandsService.addNewBrand(brandName);
+  const newBrandId = await brandsService.createBrandService(brandName);
 
   const brandData = {
     id: newBrandId,
@@ -40,7 +34,7 @@ const createBrand = asyncWrapper(async (req, res, next) => {
 
   return res
     .status(201)
-    .json({ status: httpStatusText.SUCCESS, data: { brandData } });
+    .json({ status: httpStatusText.SUCCESS, data: { brand: brandData } });
 });
 
 const updateBrand = asyncWrapper(async (req, res, next) => {
