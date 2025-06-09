@@ -27,10 +27,10 @@ const findAllDiscountsService = async (sellerId) => {
   return result;
 };
 
-const findDiscountService = async (discountId) => {
+const findDiscountService = async (discountIdOrCode) => {
   const query = discountsServiceQueries.findDiscountQuery;
 
-  const queryParams = [discountId];
+  const queryParams = [discountIdOrCode || null, discountIdOrCode || null];
 
   const [[result]] = await db.execute(query, queryParams);
 
