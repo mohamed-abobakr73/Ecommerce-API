@@ -1,73 +1,131 @@
 import db from "../configs/connectToDb.js";
+import checkIfResourceExists from "../utils/checkIfResourceExists.js";
 import { ordersServiceQueries } from "../utils/sqlQueries/index.js";
+import productsService from "./productsService.js";
 
-const findOrderId = async (userId) => {
-  const [result] = await db.query(
-    `SELECT order_id FROM orders WHERE user_id = ?`,
-    [userId]
-  );
-  return result;
+const groupOrderData = (rows) => {
+  const grouped = {};
+
+  for (const row of rows) {
+    const {
+      orderId,
+      userId,
+      status,
+      totalPrice,
+      discountId,
+      discountPercentage,
+      orderItemId,
+      quantity,
+      productId,
+      productName,
+      productDescription,
+      price,
+      categoryName,
+      brandName,
+      imagePath,
+    } = row;
+
+    if (!grouped[orderId]) {
+      grouped[orderId] = {
+        orderId,
+        userId,
+        status,
+        totalPrice,
+        discountId: discountId || "No discount",
+        discountPercentage: discountPercentage + "%" || 0,
+        items: [],
+      };
+    }
+
+    grouped[orderId].items.push({
+      orderItemId,
+      quantity,
+      productId,
+      productName,
+      productDescription,
+      price,
+      categoryName,
+      brandName,
+      imagePath,
+    });
+  }
+
+  return Object.values(grouped);
 };
 
-const findAllOrderItems = async (orderIds) => {
-  const query =
-    ordersServiceQueries.findOrderItemsQuery +
-    `WHERE
-    order_items.order_id IN (${orderIds.map(() => "?").join(", ")});`;
-
-  const [result] = await db.execute(query, orderIds);
-
-  return result;
-};
-
-const findAllOrders = async (userId) => {
-  const query = ordersServiceQueries.findOrdersQuery(`WHERE user_id = ?`);
+const findAllOrdersService = async (userId) => {
+  const query = ordersServiceQueries.findOrdersQuery;
 
   const queryParams = [userId];
 
   const [result] = await db.execute(query, queryParams);
 
-  return result;
+  checkIfResourceExists(result.length, "Orders not found");
+
+  const ordersData = groupOrderData(result);
+
+  return ordersData;
 };
 
-const findOrder = async (orderId) => {
-  const query = ordersServiceQueries.findOrdersQuery(`WHERE order_id = ?`);
+const findOrderService = async (orderId) => {
+  const query = ordersServiceQueries.findOrderQuery;
 
   const queryParams = [orderId];
 
-  const [[result]] = await db.execute(query, queryParams);
+  const [result] = await db.execute(query, queryParams);
 
-  return result;
+  checkIfResourceExists(result.length, "Order not found");
+
+  const orderData = groupOrderData(result)[0];
+
+  return orderData;
 };
 
-const createOrder = async (data) => {
-  const query = ordersServiceQueries.createOrderQuery;
+const createOrderService = async (paymentData, products) => {
+  try {
+    const query = ordersServiceQueries.createOrderQuery;
 
-  const values = Object.values(data);
+    paymentData.discount = paymentData.discount || null;
 
-  if (!values[values.length - 1]) {
-    values[values.length - 1] = null;
+    const queryParams = Object.values(paymentData);
+
+    const [result] = await db.execute(query, queryParams);
+
+    checkIfResourceExists(result.affectedRows, "Order not created");
+
+    const orderId = result.insertId;
+
+    const orderProducts = products.map((product) =>
+      Object.values({ orderId, ...product })
+    );
+
+    await createOrderItemsService(orderProducts);
+
+    await productsService.decrementProductStockQuantity(products);
+
+    return result.affectedRows;
+  } catch (error) {
+    console.log(error);
   }
-
-  const [result] = await db.execute(query, values);
-
-  return result.insertId;
 };
 
-const createOrderItems = async (items) => {
-  const query = ordersServiceQueries.createOrderItemQuery;
+const createOrderItemsService = async (orderItems) => {
+  const placeholdersQuery = orderItems.map(() => "(?, ?, ?)").join(", ");
 
-  const queryParams = [items];
+  const query = ordersServiceQueries.createOrderItemQuery(placeholdersQuery);
 
-  const [result] = db.execute(query, queryParams);
+  const queryParams = orderItems.flat();
 
-  return result.affectedRow;
+  const [result] = await db.execute(query, queryParams);
+
+  checkIfResourceExists(result.affectedRows, "Order items not created");
+
+  return result.affectedRows;
 };
 
 export default {
-  findAllOrders,
-  findAllOrderItems,
-  findOrder,
-  createOrder,
-  createOrderItems,
+  findAllOrdersService,
+  findOrderService,
+  createOrderService,
+  createOrderItemsService,
 };

@@ -21,7 +21,7 @@ const findAllDiscountQuery = `
 const findDiscountQuery = `
   ${findDiscountsFields}
   WHERE
-    discount_id = ?
+    discount_id = ? OR code = ?
 `;
 
 const createDiscountQuery = `

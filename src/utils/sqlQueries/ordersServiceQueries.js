@@ -1,21 +1,32 @@
 import snakeToCamel from "../snakeToCamel.js";
 
-const findOrderItemsQuery = `
+const orderQuery = `
   SELECT 
-  order_items.order_item_id AS ${snakeToCamel("order_item_id")},
-  order_items.order_id AS ${snakeToCamel("order_id")},
-  order_items.quantity,
-  products.product_id AS ${snakeToCamel("product_id")},
-  products.product_name AS ${snakeToCamel("product_name")},
-  products.product_description AS ${snakeToCamel("product_description")},
-  products.price,
-  categories.category_name AS ${snakeToCamel("category_name")},
-  brands.brand_name AS ${snakeToCamel("brand_name")},
-  images.image_path AS ${snakeToCamel("image_path")}
+    orders.order_id AS ${snakeToCamel("order_id")},
+    orders.user_id AS ${snakeToCamel("user_id")},
+    orders.status,
+    orders.total_price AS ${snakeToCamel("total_price")},
+    orders.discount_id AS ${snakeToCamel("discount_id")},
+    discounts.discount_percentage AS ${snakeToCamel("discount_percentage")},
+    orders.created_at AS ${snakeToCamel("created_at")},
+    order_items.order_item_id AS orderItemId,
+    order_items.quantity,
+
+    products.product_id AS productId,
+    products.product_name AS productName,
+    products.product_description AS productDescription,
+    products.price,
+
+    categories.category_name AS categoryName,
+    brands.brand_name AS brandName,
+    images.image_path AS imagePath
+
   FROM 
     orders 
   JOIN 
     order_items ON orders.order_id = order_items.order_id
+  LEFT JOIN
+    discounts ON orders.discount_id = discounts.discount_id
   JOIN 
     products ON order_items.product_id = products.product_id
   JOIN 
@@ -26,20 +37,18 @@ const findOrderItemsQuery = `
     images ON products.product_image = images.image_id
 `;
 
-const findOrdersQuery = (whereClause) => {
-  return `
-    SELECT 
-      order_id AS ${snakeToCamel("order_id")},
-      user_id AS ${snakeToCamel("user_id")},
-      status,
-      total_price AS ${snakeToCamel("total_price")},
-      discount_id AS ${snakeToCamel("discount_id")},
-      created_at AS ${snakeToCamel("created_at")}
-    FROM 
-      orders
-    ${whereClause}
+const findOrdersQuery = `
+  ${orderQuery}
+
+  WHERE orders.user_id = ?
+  ORDER BY orders.order_id DESC;
 `;
-};
+
+const findOrderQuery = `
+    ${orderQuery}
+
+    WHERE order_items.order_id = ?
+`;
 
 const createOrderQuery = `
   INSERT INTO orders
@@ -48,16 +57,18 @@ const createOrderQuery = `
     (?,?,?,?)
 `;
 
-const createOrderItemQuery = `
-  INSERT INTO order_items
-    (order_id, product_id, quantity)
-  VALUES
-    (?,?,?)
+const createOrderItemQuery = (placeholders) => {
+  return `
+    INSERT INTO order_items
+      (order_id, product_id, quantity)
+    VALUES
+      ${placeholders}
 `;
+};
 
 export default {
+  findOrderQuery,
   findOrdersQuery,
-  findOrderItemsQuery,
   createOrderQuery,
   createOrderItemQuery,
 };

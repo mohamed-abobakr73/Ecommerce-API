@@ -17,13 +17,19 @@ import {
 } from "./routes/index.js";
 import morgan from "morgan";
 import { globalErrorHandler } from "./middlewares/index.js";
+import { stripeWebHook } from "./controllers/stripeController.js";
 
 const app = express();
 
 dotenv.config();
 app.use(cors());
-app.use(express.json());
 app.use(express.urlencoded({ extended: true, limit: "3mb" }));
+app.use(
+  "/api/stripe/webhook",
+  express.raw({ type: "application/json" }),
+  stripeWebHook
+);
+app.use(express.json());
 app.use(morgan("dev"));
 
 // Initialize database
@@ -35,7 +41,7 @@ app.use("/api/categories", categoriesRouter);
 app.use("/api/brands", brandsRouter);
 app.use("/api/products", productsRouter);
 app.use("/api/carts", cartRouter);
-app.use("/stripe", stripeRouter);
+app.use("/api/stripe", express.raw({ type: "application/json" }), stripeRouter);
 app.use("/api/orders", ordersRouter);
 app.use("/api/discounts", discountsRouter);
 app.use("/api/wishlist", wishlistRouter);
