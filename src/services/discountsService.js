@@ -27,20 +27,15 @@ const findAllDiscountsService = async (sellerId) => {
   return result;
 };
 
-const findDiscount = async (filters) => {
-  let query = discountsServiceQueries.findDiscountsQuery;
+const findDiscountService = async (discountId) => {
+  const query = discountsServiceQueries.findDiscountQuery;
 
-  let queryParams;
-
-  if (Object.keys(filters).length > 0) {
-    const conditions = Object.keys(filters)
-      .map((key) => `${key} = ?`)
-      .join(" AND ");
-    query += ` WHERE ${conditions}`;
-    queryParams = Object.values(filters);
-  }
+  const queryParams = [discountId];
 
   const [[result]] = await db.execute(query, queryParams);
+
+  checkIfResourceExists(result, "Discount not found");
+
   return result;
 };
 
@@ -61,4 +56,8 @@ const createDiscountService = async (discountData) => {
   return result.affectedRows;
 };
 
-export default { findAllDiscountsService, findDiscount, createDiscountService };
+export default {
+  findAllDiscountsService,
+  findDiscountService,
+  createDiscountService,
+};

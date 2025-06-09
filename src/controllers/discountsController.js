@@ -1,5 +1,4 @@
 import { asyncWrapper } from "../middlewares/asyncWrapper.js";
-import AppError from "../utils/AppError.js";
 import httpStatusText from "../utils/httpStatusText.js";
 import discountsService from "../services/discountsService.js";
 
@@ -26,17 +25,9 @@ const createDiscount = asyncWrapper(async (req, res, next) => {
 
 const getDiscount = asyncWrapper(async (req, res, next) => {
   const { discountId } = req.params;
-  const discount = await discountsService.findDiscount({
-    discount_id: discountId,
-  });
-  if (!discount) {
-    const error = new AppError(
-      "Invalid discount id",
-      400,
-      httpStatusText.ERROR
-    );
-    return next(error);
-  }
+
+  const discount = await discountsService.findDiscountService(discountId);
+
   return res
     .status(200)
     .json({ status: httpStatusText.SUCCESS, data: { discount } });
