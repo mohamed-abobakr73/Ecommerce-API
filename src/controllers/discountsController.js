@@ -1,4 +1,3 @@
-import { validationResult } from "express-validator";
 import { asyncWrapper } from "../middlewares/asyncWrapper.js";
 import AppError from "../utils/AppError.js";
 import httpStatusText from "../utils/httpStatusText.js";
@@ -15,23 +14,14 @@ const getAllDiscounts = asyncWrapper(async (req, res, next) => {
 });
 
 const createDiscount = asyncWrapper(async (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    const error = new AppError(errors.array(), 400, httpStatusText.ERROR);
-    return next(error);
-  }
-  const discountData = req.body;
+  const validatedData = req.body;
 
-  const discountCreated = await discountsService.createDiscount(discountData);
+  await discountsService.createDiscountService(validatedData);
 
-  if (!discountCreated) {
-    const error = new AppError("Something went wrong, please try again");
-    return next(error);
-  }
-
-  return res
-    .status(200)
-    .json({ status: httpStatusText.SUCCESS, data: { discountData } });
+  return res.status(200).json({
+    status: httpStatusText.SUCCESS,
+    data: { discount: validatedData },
+  });
 });
 
 const getDiscount = asyncWrapper(async (req, res, next) => {

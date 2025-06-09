@@ -7,14 +7,18 @@ import {
 
 // TODO FIX the find discount query and logic
 
-const findAllDiscountsService = async (sellerId) => {
-  const query = discountsServiceQueries.findAllDiscountQuery;
-
+const checkIfSellerExists = async (sellerId) => {
   const checkIfUserExistsQuery = usersServiceQueries.checkIfUserExistsByIdQuery;
 
   const [user] = await db.execute(checkIfUserExistsQuery, [sellerId]);
 
   checkIfResourceExists(user.length, "Seller not found");
+};
+
+const findAllDiscountsService = async (sellerId) => {
+  const query = discountsServiceQueries.findAllDiscountQuery;
+
+  await checkIfSellerExists(sellerId);
 
   const queryParams = [sellerId];
 
@@ -40,8 +44,11 @@ const findDiscount = async (filters) => {
   return result;
 };
 
-const createDiscount = async (data) => {
-  const { sellerId, code, discountPercentage, validFrom, validTo } = data;
+const createDiscountService = async (discountData) => {
+  const { sellerId, code, discountPercentage, validFrom, validTo } =
+    discountData;
+
+  await checkIfSellerExists(sellerId);
 
   const query = discountsServiceQueries.createDiscountQuery;
 
@@ -49,7 +56,9 @@ const createDiscount = async (data) => {
 
   const [result] = await db.execute(query, queryParams);
 
+  checkIfResourceExists(result.affectedRows, "Discount not created");
+
   return result.affectedRows;
 };
 
-export default { findAllDiscountsService, findDiscount, createDiscount };
+export default { findAllDiscountsService, findDiscount, createDiscountService };
