@@ -4,9 +4,12 @@ import {
   getAllDiscounts,
   getDiscount,
 } from "../controllers/discountsController.js";
-import discountsValidation from "../middlewares/discountsValidation.js";
-import verifyToken from "../middlewares/verifyToken.js";
-import isAllowed from "../middlewares/isAllowed.js";
+import {
+  discountsValidation,
+  verifyToken,
+  isAllowed,
+  validateRequestBody,
+} from "../middlewares/index.js";
 import usersRoles from "../utils/usersRoles.js";
 
 const discountsRouter = Router();
@@ -33,6 +36,7 @@ discountsRouter
     verifyToken,
     isAllowed(usersRoles.SELLER, usersRoles.ADMIN),
     discountsValidation(),
+    validateRequestBody,
     createDiscount
   );
 

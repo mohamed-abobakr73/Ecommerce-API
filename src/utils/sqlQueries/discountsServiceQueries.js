@@ -1,7 +1,6 @@
 import snakeToCamel from "../snakeToCamel.js";
-// TODO FIX the find discount query and logic
 
-const findAllDiscountQuery = `
+const findDiscountsFields = `
   SELECT 
     discount_id AS ${snakeToCamel("discount_id")},
     seller_id AS ${snakeToCamel("seller_id")},
@@ -11,8 +10,18 @@ const findAllDiscountQuery = `
     valid_to AS ${snakeToCamel("valid_to")}
   FROM 
     discounts
+`;
+
+const findAllDiscountQuery = `
+  ${findDiscountsFields}
   WHERE
     seller_id = ?
+`;
+
+const findDiscountQuery = `
+  ${findDiscountsFields}
+  WHERE
+    discount_id = ?
 `;
 
 const createDiscountQuery = `
@@ -22,4 +31,4 @@ const createDiscountQuery = `
     (?,?,?,?,?);
 `;
 
-export default { findAllDiscountQuery, createDiscountQuery };
+export default { findAllDiscountQuery, findDiscountQuery, createDiscountQuery };
