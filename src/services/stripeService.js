@@ -5,7 +5,7 @@ import productsService from "./productsService.js";
 import discountsService from "./discountsService.js";
 
 const checkAndCreateDiscount = async (discountCode) => {
-  if (discountCode !== null) {
+  if (discountCode) {
     const discount = await discountsService.findDiscountService(discountCode);
 
     if (!discount) {

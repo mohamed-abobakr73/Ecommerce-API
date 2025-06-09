@@ -1,5 +1,7 @@
 import db from "../configs/connectToDb.js";
+import checkIfResourceExists from "../utils/checkIfResourceExists.js";
 import { ordersServiceQueries } from "../utils/sqlQueries/index.js";
+import productsService from "./productsService.js";
 
 const findOrderId = async (userId) => {
   const [result] = await db.query(
@@ -40,34 +42,51 @@ const findOrder = async (orderId) => {
   return result;
 };
 
-const createOrder = async (data) => {
-  const query = ordersServiceQueries.createOrderQuery;
+const createOrderService = async (paymentData, products) => {
+  try {
+    const query = ordersServiceQueries.createOrderQuery;
 
-  const values = Object.values(data);
+    paymentData.discount = paymentData.discount || null;
 
-  if (!values[values.length - 1]) {
-    values[values.length - 1] = null;
+    const queryParams = Object.values(paymentData);
+
+    const [result] = await db.execute(query, queryParams);
+
+    const orderId = result.insertId;
+
+    const orderProducts = products.map((product) =>
+      Object.values({ orderId, ...product })
+    );
+
+    const orderItems = await createOrderItemsService(orderProducts);
+
+    const decrementedProducts =
+      await productsService.decrementProductStockQuantity(products);
+
+    return result.affectedRows;
+  } catch (error) {
+    console.log(error);
   }
-
-  const [result] = await db.execute(query, values);
-
-  return result.insertId;
 };
 
-const createOrderItems = async (items) => {
-  const query = ordersServiceQueries.createOrderItemQuery;
+const createOrderItemsService = async (orderItems) => {
+  const placeholdersQuery = orderItems.map(() => "(?, ?, ?)").join(", ");
 
-  const queryParams = [items];
+  const query = ordersServiceQueries.createOrderItemQuery(placeholdersQuery);
 
-  const [result] = db.execute(query, queryParams);
+  const queryParams = orderItems.flat();
 
-  return result.affectedRow;
+  const [result] = await db.execute(query, queryParams);
+
+  checkIfResourceExists(result.affectedRows, "Order items not created");
+
+  return result.affectedRows;
 };
 
 export default {
   findAllOrders,
   findAllOrderItems,
   findOrder,
-  createOrder,
-  createOrderItems,
+  createOrderService,
+  createOrderItemsService,
 };

@@ -9,7 +9,7 @@ const createOrdersTable = async () => {
         status ENUM('Pending', 'Shipped', 'Delivered', 'Canceled', 'Processing') NOT NULL,
         total_price DECIMAL(6,2) NOT NULL,
         discount_id INT,
-        created_at DATE NOT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users(user_id),
         FOREIGN KEY (discount_id) REFERENCES discounts(discount_id)
       );

@@ -48,12 +48,14 @@ const createOrderQuery = `
     (?,?,?,?)
 `;
 
-const createOrderItemQuery = `
-  INSERT INTO order_items
-    (order_id, product_id, quantity)
-  VALUES
-    (?,?,?)
+const createOrderItemQuery = (placeholders) => {
+  return `
+    INSERT INTO order_items
+      (order_id, product_id, quantity)
+    VALUES
+      ${placeholders}
 `;
+};
 
 export default {
   findOrdersQuery,
