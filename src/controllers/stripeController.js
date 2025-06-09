@@ -1,6 +1,5 @@
 import { asyncWrapper } from "../middlewares/asyncWrapper.js";
 import dotenv from "dotenv";
-import productsService from "../services/productsService.js";
 import ordersService from "../services/ordersService.js";
 import httpStatusText from "../utils/httpStatusText.js";
 import stripeService from "../services/stripeService.js";
