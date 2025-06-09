@@ -3,16 +3,12 @@ import { asyncWrapper } from "../middlewares/asyncWrapper.js";
 import AppError from "../utils/AppError.js";
 import httpStatusText from "../utils/httpStatusText.js";
 import discountsService from "../services/discountsService.js";
-import checkIfUserExists from "../utils/checkIfUserExists.js";
 
 const getAllDiscounts = asyncWrapper(async (req, res, next) => {
   const { userId } = req.query;
-  const userDoNotExist = await checkIfUserExists(userId);
-  if (userDoNotExist) {
-    return next(userDoNotExist);
-  }
 
-  const discounts = await discountsService.findAllDiscounts(userId);
+  const discounts = await discountsService.findAllDiscountsService(userId);
+
   return res
     .status(200)
     .json({ status: httpStatusText.SUCCESS, data: { discounts } });
