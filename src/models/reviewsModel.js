@@ -9,7 +9,7 @@ const createReviewsTable = async () => {
         product_id INT NOT NULL,
         rating INT NOT NULL,
         review_text TEXT NOT NULL,
-        created_at DATE NOT NULL,
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users(user_id),
         FOREIGN KEY (product_id) REFERENCES products(product_id)
       );

@@ -5,7 +5,7 @@ import { checkIfProductIsValid } from "./cartService.js";
 const findAllReviewsService = async (productId) => {
   const query = reviewsServiceQueries.findAllReviewsQuery;
 
-  checkIfProductIsValid(productId);
+  await checkIfProductIsValid(productId);
 
   const queryParams = [productId];
 
@@ -18,6 +18,8 @@ const createReviewService = async (data) => {
   const { userId, productId, rating, reviewText } = data;
 
   const query = reviewsServiceQueries.createReviewQuery;
+
+  await checkIfProductIsValid(productId);
 
   const queryParams = [userId, productId, rating, reviewText];
 

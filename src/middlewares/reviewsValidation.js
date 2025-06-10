@@ -9,14 +9,14 @@ const reviewsValidation = () => {
       .withMessage("Rating must be a number")
       .custom((value) => {
         if (value < 1) {
-          throw new Error("Rating must be atleast 1");
+          throw new Error("Rating must be at least 1");
         }
         if (value > 5) {
           throw new Error("Rating must be at most 5");
         }
         return true;
       }),
-    body("reveiwText")
+    body("reviewText")
       .notEmpty()
       .withMessage("Reveiw text is required")
       .isLength({ min: 4 })
