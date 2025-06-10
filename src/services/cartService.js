@@ -5,7 +5,7 @@ import httpStatusText from "../utils/httpStatusText.js";
 import { cartServiceQueries } from "../utils/sqlQueries/index.js";
 import productsService from "./productsService.js";
 
-const checkIfProductIsValid = async (productId) => {
+export const checkIfProductIsValid = async (productId) => {
   const product = await productsService.findProductService(productId);
 
   checkIfResourceExists(product, "Product not found");
