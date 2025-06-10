@@ -1,19 +1,14 @@
 import { asyncWrapper } from "../middlewares/asyncWrapper.js";
-import AppError from "../utils/AppError.js";
 import httpStatusText from "../utils/httpStatusText.js";
 import wishlistService from "../services/wishlistService.js";
-import checkIfUserExists from "../utils/checkIfUserExists.js";
-import productsService from "../services/productsService.js";
 
-const getAllWihslist = asyncWrapper(async (req, res, next) => {
+const getAllWishlist = asyncWrapper(async (req, res, next) => {
   const { userId } = req.params;
-  const userDoNotExist = await checkIfUserExists(userId);
-  if (userDoNotExist) {
-    const error = new AppError("Invalid user id", 400, httpStatusText.ERROR);
-    return next(error);
-  }
 
-  const wishlistItems = await wishlistService.getAllwishlistItems(userId);
+  const wishlistItems = await wishlistService.getAllWishlistItemsService(
+    userId
+  );
+
   res.status(200).json({
     status: httpStatusText.SUCCESS,
     data: { userWishlist: wishlistItems },
@@ -35,10 +30,16 @@ const addOrRemoveItemToWishlist = asyncWrapper(async (req, res, next) => {
   let resData = {};
 
   if (productExistsInWishlist) {
-    await wishlistService.removeItemFromWishlist({ userId, productId });
+    await wishlistService.addOrRemoveItemToWishlistService("remove", {
+      userId,
+      productId,
+    });
     resData = { removedProductId: productId };
   } else {
-    await wishlistService.addItemToWishlistService({ userId, productId });
+    await wishlistService.addOrRemoveItemToWishlistService("add", {
+      userId,
+      productId,
+    });
     resData = { addedProductId: productId };
   }
 
@@ -58,4 +59,4 @@ const addOrRemoveItemToWishlist = asyncWrapper(async (req, res, next) => {
   });
 });
 
-export { getAllWihslist, addOrRemoveItemToWishlist };
+export { getAllWishlist, addOrRemoveItemToWishlist };

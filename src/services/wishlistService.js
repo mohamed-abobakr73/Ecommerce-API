@@ -1,4 +1,3 @@
-import { check } from "express-validator";
 import db from "../configs/connectToDb.js";
 import checkIfResourceExists from "../utils/checkIfResourceExists.js";
 import { wishlistServiceQueries } from "../utils/sqlQueries/index.js";
@@ -31,30 +30,30 @@ const findWishlistItemService = async (data) => {
   return result;
 };
 
-const addItemToWishlistService = async (data) => {
+const addOrRemoveItemToWishlistService = async (operation, data) => {
   const { userId, productId } = data;
 
-  const query = wishlistServiceQueries.addItemToWishlistQuery;
+  let query;
+
+  switch (operation) {
+    case "add":
+      query = wishlistServiceQueries.addItemToWishlistQuery;
+      break;
+    case "remove":
+      query = wishlistServiceQueries.deleteItemFromWishlistQuery;
+      break;
+  }
 
   const queryParams = [userId, productId];
 
   const [result] = await db.execute(query, queryParams);
 
-  checkIfResourceExists(result.affectedRows, "Item not added to wishlist");
-
-  return result.affectedRows;
-};
-
-const removeItemFromWishlist = async (data) => {
-  const { userId, productId } = data;
-
-  const query = wishlistServiceQueries.deleteItemFromWishlistQuery;
-
-  const queryParams = [userId, productId];
-
-  const [result] = await db.execute(query, queryParams);
-
-  checkIfResourceExists(result.affectedRows, "Item not removed from wishlist");
+  checkIfResourceExists(
+    result.affectedRows,
+    operation === "add"
+      ? "Item not added to wishlist"
+      : "Item not removed from wishlist"
+  );
 
   return result.affectedRows;
 };
@@ -62,6 +61,5 @@ const removeItemFromWishlist = async (data) => {
 export default {
   getAllWishlistItemsService,
   findWishlistItemService,
-  addItemToWishlistService,
-  removeItemFromWishlist,
+  addOrRemoveItemToWishlistService,
 };
