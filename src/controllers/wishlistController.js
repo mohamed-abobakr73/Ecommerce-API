@@ -22,39 +22,40 @@ const getAllWihslist = asyncWrapper(async (req, res, next) => {
 
 const addOrRemoveItemToWishlist = asyncWrapper(async (req, res, next) => {
   const { userId } = req.params;
-  const { productId } = req.body;
+  const validatedData = req.body;
+  const { productId } = validatedData;
 
-  const userDoNotExist = await checkIfUserExists(userId);
+  const productExistsInWishlist = await wishlistService.findWishlistItemService(
+    {
+      userId,
+      productId,
+    }
+  );
 
-  if (userDoNotExist) {
-    const error = new AppError("Invalid user id", 400, httpStatusText.ERROR);
-    return next(error);
-  }
-
-  const validProductId = await productsService.findProduct(productId);
-  if (!validProductId) {
-    const error = new AppError("Invalid product id", 400, httpStatusText.FAIL);
-    return next(error);
-  }
-
-  const productExistsInWishlist = await wishlistService.findWishlistItem({
-    userId,
-    productId,
-  });
+  let resData = {};
 
   if (productExistsInWishlist) {
     await wishlistService.removeItemFromWishlist({ userId, productId });
-    return res.status(200).json({
-      status: httpStatusText.SUCCESS,
-      data: { removedProductId: productId },
-    });
+    resData = { removedProductId: productId };
   } else {
-    await wishlistService.addItemToWishlist({ userId, productId });
-    return res.status(200).json({
-      status: httpStatusText.SUCCESS,
-      data: { addedProductId: productId },
-    });
+    await wishlistService.addItemToWishlistService({ userId, productId });
+    resData = { addedProductId: productId };
   }
+
+  return res.status(200).json({
+    status: httpStatusText.SUCCESS,
+    data: {
+      operation: resData.addedProductId
+        ? {
+            addedProductId: resData.addedProductId,
+            msg: "Product added to wishlist",
+          }
+        : {
+            removedProductId: resData.removedProductId,
+            msg: "Product removed from wishlist",
+          },
+    },
+  });
 });
 
 export { getAllWihslist, addOrRemoveItemToWishlist };
