@@ -1,7 +1,9 @@
 import db from "../configs/connectToDb.js";
+import checkIfResourceExists from "../utils/checkIfResourceExists.js";
 import { wishlistServiceQueries } from "../utils/sqlQueries/index.js";
+import { checkIfProductIsValid } from "./cartService.js";
 
-const getAllwishlistItems = async (userId) => {
+const getAllWishlistItemsService = async (userId) => {
   const query =
     wishlistServiceQueries.findWishlistItemsQuery("WHERE user_id = ?;");
 
@@ -12,11 +14,14 @@ const getAllwishlistItems = async (userId) => {
   return result;
 };
 
-const findWishlistItem = async (data) => {
+const findWishlistItemService = async (data) => {
   const { userId, productId } = data;
+
   const query = wishlistServiceQueries.findWishlistItemsQuery(
-    "WHERE user_id = ? AND product_id = ?;"
+    "WHERE user_id = ? AND products.product_id = ?;"
   );
+
+  await checkIfProductIsValid(productId);
 
   const queryParams = [userId, productId];
 
@@ -25,31 +30,36 @@ const findWishlistItem = async (data) => {
   return result;
 };
 
-const addItemToWishlist = async (data) => {
+const addOrRemoveItemToWishlistService = async (operation, data) => {
   const { userId, productId } = data;
-  const query = wishlistServiceQueries.addItemToWishlistQuery;
+
+  let query;
+
+  switch (operation) {
+    case "add":
+      query = wishlistServiceQueries.addItemToWishlistQuery;
+      break;
+    case "remove":
+      query = wishlistServiceQueries.deleteItemFromWishlistQuery;
+      break;
+  }
 
   const queryParams = [userId, productId];
 
   const [result] = await db.execute(query, queryParams);
 
-  return result.affectedRows;
-};
-
-const removeItemFromWishlist = async (data) => {
-  const { userId, productId } = data;
-  const query = wishlistServiceQueries.deleteItemFromWishlistQuery;
-
-  const queryParams = [userId, productId];
-
-  const [result] = await db.execute(query, queryParams);
+  checkIfResourceExists(
+    result.affectedRows,
+    operation === "add"
+      ? "Item not added to wishlist"
+      : "Item not removed from wishlist"
+  );
 
   return result.affectedRows;
 };
 
 export default {
-  getAllwishlistItems,
-  findWishlistItem,
-  addItemToWishlist,
-  removeItemFromWishlist,
+  getAllWishlistItemsService,
+  findWishlistItemService,
+  addOrRemoveItemToWishlistService,
 };
