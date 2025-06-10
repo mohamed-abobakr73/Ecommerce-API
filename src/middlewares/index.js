@@ -13,6 +13,7 @@ import validateRequestBody from "./validateRequestBody.js";
 import orderValidation from "./orderValidation.js";
 import reviewsValidation from "./reviewsValidation.js";
 import cartItemValidation from "./cartItemValidation.js";
+import wishlistValidation from "./wishlistValidation.js";
 
 export {
   addressesValidation,
@@ -30,4 +31,5 @@ export {
   orderValidation,
   reviewsValidation,
   cartItemValidation,
+  wishlistValidation,
 };

@@ -3,12 +3,23 @@ import {
   getAllWishlist,
   addOrRemoveItemToWishlist,
 } from "../controllers/wishlistController.js";
-import { verifyToken } from "../middlewares/index.js";
+import {
+  verifyToken,
+  wishlistValidation,
+  validateRequestBody,
+} from "../middlewares/index.js";
 
 const wishlistRouter = Router();
 
 wishlistRouter.route("/:userId").get(verifyToken, getAllWishlist);
 
-wishlistRouter.route("/:userId").post(verifyToken, addOrRemoveItemToWishlist);
+wishlistRouter
+  .route("/:userId")
+  .post(
+    verifyToken,
+    wishlistValidation(),
+    validateRequestBody,
+    addOrRemoveItemToWishlist
+  );
 
 export default wishlistRouter;
