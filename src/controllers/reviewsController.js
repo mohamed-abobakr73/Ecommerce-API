@@ -9,13 +9,8 @@ import productsService from "../services/productsService.js";
 const getAllReviews = asyncWrapper(async (req, res, next) => {
   const { productId } = req.params;
 
-  const validProductId = await productsService.findProduct(+productId);
-  if (!validProductId) {
-    const error = new AppError("Invalid product id", 400, httpStatusText.FAIL);
-    return next(error);
-  }
+  const productReviews = await reviewsService.findAllReviewsService(productId);
 
-  const productReviews = await reviewsService.findAllReviews(productId);
   return res
     .status(200)
     .json({ status: httpStatusText.SUCCESS, data: { productReviews } });

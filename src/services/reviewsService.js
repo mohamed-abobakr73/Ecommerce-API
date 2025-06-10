@@ -1,8 +1,11 @@
 import db from "../configs/connectToDb.js";
 import { reviewsServiceQueries } from "../utils/sqlQueries/index.js";
+import { checkIfProductIsValid } from "./cartService.js";
 
-const findAllReviews = async (productId) => {
+const findAllReviewsService = async (productId) => {
   const query = reviewsServiceQueries.findAllReviewsQuery;
+
+  checkIfProductIsValid(productId);
 
   const queryParams = [productId];
 
@@ -11,7 +14,7 @@ const findAllReviews = async (productId) => {
   return result;
 };
 
-const addReview = async (data) => {
+const createReviewService = async (data) => {
   const { userId, productId, rating, reviewText } = data;
 
   const query = reviewsServiceQueries.createReviewQuery;
@@ -23,4 +26,4 @@ const addReview = async (data) => {
   return result.affectedRows;
 };
 
-export default { findAllReviews, addReview };
+export default { findAllReviewsService, createReviewService };
