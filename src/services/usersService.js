@@ -50,7 +50,7 @@ const findUserService = async (filters) => {
 
     const user = await db.execute(query, queryParams);
 
-    checkIfResourceExists(user, "User not found");
+    checkIfResourceExists(user[0][0], "User not found");
 
     return user[0][0];
   } catch (error) {
