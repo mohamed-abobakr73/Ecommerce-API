@@ -33,6 +33,7 @@ app.use(
 );
 app.use(express.json());
 app.use(morgan("dev"));
+
 // Initialize database
 initializeDatabase();
 
@@ -55,6 +56,4 @@ app.use("/api/addresses", addressesRouter);
 // Error handler
 app.use(globalErrorHandler);
 
-app.listen(process.env.PORT || 5000, () => {
-  console.log("listening on port 5000");
-});
+export default app
