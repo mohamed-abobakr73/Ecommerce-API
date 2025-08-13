@@ -1,5 +1,4 @@
 import { asyncWrapper } from "../middlewares/asyncWrapper.js";
-import AppError from "../utils/AppError.js";
 import httpStatusText from "../utils/httpStatusText.js";
 import categoriesService from "../services/categoriesService.js";
 
