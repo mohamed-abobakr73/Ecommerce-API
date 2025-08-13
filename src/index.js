@@ -40,6 +40,14 @@ initializeDatabase();
 // Swagger Documentation
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
+// Health check
+app.get("/", (req, res) => {
+  res.status(200).json({
+    status: "success",
+    message: "Ecommerce API is running",
+  });
+})
+
 // Routes
 app.use("/api/users", usersRouter);
 app.use("/api/categories", categoriesRouter);
